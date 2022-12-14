@@ -1,10 +1,12 @@
 {
   "development": {
-    "username": "root",
-    "password": null,
-    "database": "api_cleanroom",
-    "host": "127.0.0.1",
-    "dialect": "mysql"
+    "username": "postgres",
+    "password": "seVTA3Y90tbVJwY8WQh1",
+    "database": "railway",
+    "host": "containers-us-west-168.railway.app",
+    "port":6254,
+    "dialect": "postgres",
+    "oracle":"postgresql://${{ PGUSER }}:${{ PGPASSWORD }}@${{ PGHOST }}:${{ PGPORT }}/${{ PGDATABASE }}"
   },
   "test": {
     "username": "root",

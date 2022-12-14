@@ -9,33 +9,33 @@ const env = process.env.NODE_ENV || 'development';
 // const config = require(__dirname + '/../config/config.json')[env];
 const db = {};
 
-// let sequelize;
-// const custumizeConfig ={
-//   // host: process.env.DB_HOST,
-//   // port:process.env.DB_PORT,
-//   dialect: 'mysql',
-//   // oracle:process.env.DDB_DATABASE_URL,
-//   logging:false,
-//   // dialectOption:{
-//   //     ssl:{
-//   //       require:true,
-//   //       rejectUnauthorized:false
-//   //     }
-//   //   }
-// }
+let sequelize;
+const custumizeConfig ={
+  host: process.env.DB_HOST,
+  port:process.env.DB_PORT,
+  dialect: 'postgres',
+  oracle:process.env.DDB_DATABASE_URL,
+  logging:false,
+  dialectOption:{
+      ssl:{
+        require:true,
+        rejectUnauthorized:false
+      }
+    }
+}
 
-// sequelize = new Sequelize(
-//   process.env.DB_DATABASE_NAME, 
-//   process.env.DB_USERNAME, 
-//   process.env.DB_PASSWORD, 
-//   custumizeConfig
-//   );
-const sequelize = new Sequelize('api_cleanroom', 'root', null, {
-  dialect: 'mysql',
-  dialectOptions: {
-    // Your mysql2 options here
-  }
-})
+sequelize = new Sequelize(
+  process.env.DB_DATABASE_NAME, 
+  process.env.DB_USERNAME, 
+  process.env.DB_PASSWORD, 
+  custumizeConfig
+  );
+// const sequelize = new Sequelize('api_cleanroom', 'root', null, {
+//   dialect: 'mysql',
+//   dialectOptions: {
+//     // Your mysql2 options here
+//   }
+// })
 fs
   .readdirSync(__dirname)
   .filter(file => {

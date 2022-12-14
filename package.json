@@ -1,7 +1,7 @@
 {
   "name": "nodejs",
   "version": "1.0.0",
-  "description": "Back-end NodeJS quyquang",
+  "description": "Back-end NodeJS",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -13,9 +13,9 @@
     "url": ""
   },
   "keywords": [
-    "quyquang"
+    ""
   ],
-  "author": "quyquang",
+  "author": "",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
