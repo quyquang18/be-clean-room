@@ -11,22 +11,24 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      statusDevice.belongsTo(models.Location,{foreignKey: 'locationID'});
-      statusDevice.belongsTo(models.Device,{foreignKey: 'deviceId'});
+      // statusDevice.belongsTo(models.Location,{foreignKey: 'locationID'});
+      // statusDevice.belongsTo(models.Device,{foreignKey: 'deviceId'});
     }
-  };
-  statusDevice.init({
-    status: DataTypes.STRING,
-    date: DataTypes.DATEONLY,
-    stateStartTime: DataTypes.TIME,
-    stateEndTime: DataTypes.TIME,
-    statusTime: DataTypes.TIME,
-    deviceId: DataTypes.INTEGER,
-    locationID: DataTypes.INTEGER,
-    userId: DataTypes.INTEGER,
-  }, {
-    sequelize,
-    modelName: 'statusDevice',
-  });
+  }
+  statusDevice.init(
+    {
+      status: DataTypes.STRING,
+      date: DataTypes.STRING,
+      stateStartTime: DataTypes.STRING,
+      stateEndTime: DataTypes.STRING,
+      deviceId: DataTypes.INTEGER,
+      roomId: DataTypes.INTEGER,
+      userId: DataTypes.INTEGER,
+    },
+    {
+      sequelize,
+      modelName: "statusDevice",
+    }
+  );
   return statusDevice;
 };

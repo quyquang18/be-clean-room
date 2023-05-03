@@ -9,20 +9,23 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   };
-  valueSensor.init({
-    temperature: DataTypes.STRING,
-    humidity: DataTypes.STRING,
-    dust25: DataTypes.STRING,
-    dust10: DataTypes.STRING,
-    pressIn: DataTypes.STRING,
-    pressOut: DataTypes.STRING,
-    date: DataTypes.DATEONLY,
-    time: DataTypes.TIME,
-    locationID: DataTypes.INTEGER,
-    userId: DataTypes.INTEGER,
-  }, {
-    sequelize,
-    modelName: 'valueSensor',
-  });
+  valueSensor.init(
+    {
+      temperature: DataTypes.STRING,
+      humidity: DataTypes.STRING,
+      dust25: DataTypes.STRING,
+      dust10: DataTypes.STRING,
+      pressIn: DataTypes.STRING,
+      pressOut: DataTypes.STRING,
+      date: DataTypes.STRING,
+      time: DataTypes.TIME,
+      roomId: DataTypes.INTEGER,
+      userId: DataTypes.INTEGER,
+    },
+    {
+      sequelize,
+      modelName: "valueSensor",
+    }
+  );
   return valueSensor;
 };

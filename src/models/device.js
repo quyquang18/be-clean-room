@@ -11,18 +11,21 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Device.belongsTo(models.Location,{foreignKey: 'locationID'});
-      Device.hasOne(models.statusDevice,{foreignKey: 'deviceId'})
+      Device.belongsTo(models.Room, { foreignKey: "roomId", targetKey: "id" });
+      // Device.hasOne(models.statusDevice,{foreignKey: 'deviceId'})
     }
-  };
-  Device.init({
-    deviceName: DataTypes.STRING,
-    typeDevice: DataTypes.STRING, 
-    locationID: DataTypes.INTEGER, 
-    userId: DataTypes.INTEGER,
-  }, {
-    sequelize,
-    modelName: 'Device',
-  });
+  }
+  Device.init(
+    {
+      deviceName: DataTypes.STRING,
+      typeDevice: DataTypes.STRING,
+      roomId: DataTypes.INTEGER,
+      userId: DataTypes.INTEGER,
+    },
+    {
+      sequelize,
+      modelName: "Device",
+    }
+  );
   return Device;
 };

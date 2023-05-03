@@ -1,24 +1,23 @@
 require('dotenv').config();
 const { Sequelize } = require('sequelize');
 // Option 3: Passing parameters separately (other dialects)
-const sequelize = new Sequelize(
-  process.env.DB_DATABASE_NAME, 
-  process.env.DB_USERNAME, 
-  process.env.DB_PASSWORD, 
-  {
-    host: process.env.DB_HOST,
-    port:process.env.DB_PORT,
-    dialect: 'postgres',
-    oracle:process.env.DB_DATABASE_URL,
-    logging:false,
-    dialectOption:{
-      ssl:{
-        require:true,
-        rejectUnauthorized:false
-      }
-    }
-}
-);
+const sequelize = new Sequelize(process.env.DB_DATABASE_NAME, process.env.DB_USERNAME, process.env.DB_PASSWORD, {
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  dialect: "postgres",
+  oracle: process.env.DB_DATABASE_URL,
+  logging: false,
+  query: {
+    raw: true,
+  },
+  timezone: "+07:00",
+  dialectOption: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false,
+    },
+  },
+});
 // const sequelize = new Sequelize('api_cleanroom', 'root', null, {
 //   dialect: 'mysql',
 //   dialectOptions: {
