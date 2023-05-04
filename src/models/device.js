@@ -12,6 +12,11 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       Device.belongsTo(models.Room, { foreignKey: "roomId", targetKey: "id" });
+      User.belongsTo(models.Allcode, {
+        foreignKey: "typeDevice",
+        targetKey: "keyMap",
+        as: "typeDeviceData",
+      });
       // Device.hasOne(models.statusDevice,{foreignKey: 'deviceId'})
     }
   }

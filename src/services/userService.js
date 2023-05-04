@@ -122,7 +122,6 @@ let createNewUser = (data) => {
           verifed: false,
           roleID: "R3",
         });
-
         let token = await db.Token.create({
           token: crypto.randomBytes(32).toString("hex"),
           userId: user.id,
@@ -140,6 +139,7 @@ let createNewUser = (data) => {
         });
       }
     } catch (error) {
+      console.log(error);
       reject(error);
     }
   });
