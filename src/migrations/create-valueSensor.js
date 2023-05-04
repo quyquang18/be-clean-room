@@ -26,8 +26,11 @@ module.exports = {
           pressOut: {
             type: Sequelize.STRING,
           },
+          oxy: {
+            type: Sequelize.STRING,
+          },
           date: {
-            type: Sequelize.DATEONLY,
+            type: Sequelize.BIGINT,
           },
           time: {
             type: Sequelize.BIGINT,
