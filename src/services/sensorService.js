@@ -14,10 +14,11 @@ let getValueSensorByTime = (inputData) => {
           const dateObj = moment(new Date(+inputData.date));
           const startTime = dateObj.startOf(inputData.type).valueOf();
           const endTime = dateObj.endOf(inputData.type).valueOf();
+          console.log(startTime, endTime);
           let resData = await db.valueSensor.findAll({
             where: {
-              roomId: inputData.roomId,
-              userId: inputData.userId,
+              roomId: +inputData.roomId,
+              userId: +inputData.userId,
               date: {
                 [Op.between]: [startTime, endTime],
               },
@@ -25,6 +26,7 @@ let getValueSensorByTime = (inputData) => {
             order: [["date", "ASC"]],
             raw: true,
           });
+          console.log(resData);
           if (!resData) resData = {};
           resolve({
             errCode: 0,
@@ -38,8 +40,8 @@ let getValueSensorByTime = (inputData) => {
         const endTime = moment(new Date(+inputDate[1])).endOf("date").valueOf();
         let resData = await db.valueSensor.findAll({
           where: {
-            roomId: inputData.roomId,
-            userId: inputData.userId,
+            roomId: +inputData.roomId,
+            userId: +inputData.userId,
             date: {
               [Op.between]: [startTime, endTime],
             },
@@ -102,7 +104,6 @@ let createNewValueSensor = (data) => {
   });
 };
 module.exports = {
-  createNewValueSensor: createNewValueSensor,
   getValueSensorByTime: getValueSensorByTime,
   createNewValueSensor: createNewValueSensor,
 };
