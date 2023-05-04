@@ -12,8 +12,8 @@ let getValueSensorByTime = (inputData) => {
       } else {
         if (inputData.type === "month" || inputData.type === "date") {
           const dateObj = moment(new Date(+inputData.date));
-          const startTime = "" + dateObj.startOf(inputData.type).valueOf();
-          const endTime = "" + dateObj.endOf(inputData.type).valueOf();
+          const startTime = dateObj.startOf(inputData.type).valueOf();
+          const endTime = dateObj.endOf(inputData.type).valueOf();
           let resData = await db.valueSensor.findAll({
             where: {
               roomId: inputData.roomId,
@@ -34,8 +34,8 @@ let getValueSensorByTime = (inputData) => {
       }
       if (inputData.type === "range") {
         let inputDate = inputData.date.split(",");
-        const startTime = "" + moment(new Date(+inputDate[0])).startOf("date").valueOf();
-        const endTime = "" + moment(new Date(+inputDate[1])).endOf("date").valueOf();
+        const startTime = moment(new Date(+inputDate[0])).startOf("date").valueOf();
+        const endTime = moment(new Date(+inputDate[1])).endOf("date").valueOf();
         let resData = await db.valueSensor.findAll({
           where: {
             roomId: inputData.roomId,
