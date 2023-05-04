@@ -240,8 +240,8 @@ const getStatusDevice = (inputData) => {
         let data = "";
         if (inputData.type === "month" || inputData.type === "date") {
           const dateObj = moment(new Date(+inputData.date));
-          const startTime = dateObj.startOf(inputData.type).valueOf();
-          const endTime = dateObj.endOf(inputData.type).valueOf();
+          const startTime = dateObj.startOf(inputData.type).utcOffset("+07:00").valueOf();
+          const endTime = dateObj.endOf(inputData.type).utcOffset("+07:00").valueOf();
           data = await db.statusDevice.findAll({
             where: {
               userId: +inputData.userId,
@@ -260,8 +260,8 @@ const getStatusDevice = (inputData) => {
         if (inputData.type === "range") {
           let inputDate = inputData.date.split(",");
           console.log(inputData.date);
-          const startTime = moment(new Date(+inputDate[0])).startOf("date").valueOf();
-          const endTime = moment(new Date(+inputDate[1])).endOf("date").valueOf();
+          const startTime = moment(new Date(+inputDate[0])).utcOffset("+07:00").startOf("date").valueOf();
+          const endTime = moment(new Date(+inputDate[1])).utcOffset("+07:00").endOf("date").valueOf();
           data = await db.statusDevice.findAll({
             where: {
               userId: inputData.userId,
