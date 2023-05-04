@@ -73,6 +73,7 @@ let checkUserEmail = (userEmail) => {
         resolve(false);
       }
     } catch (error) {
+      console.log(error);
       reject(error);
     }
   });
@@ -164,6 +165,7 @@ let deleteUser = (userId) => {
         message: `The user is deleted`,
       });
     } catch (error) {
+      console.log(error);
       reject(error);
     }
   });
@@ -233,6 +235,7 @@ let updateUser = (data) => {
         });
       }
     } catch (error) {
+      console.log(error);
       reject(error);
     }
   });
@@ -299,6 +302,7 @@ let verifyEmail = (inputId, inputToken) => {
         message: `Email verified successfully`,
       });
     } catch (error) {
+      console.log(error);
       reject(error);
     }
   });
@@ -338,7 +342,7 @@ let getDetailUserById = (inputId) => {
             {
               model: db.Allcode,
               as: "genderData",
-              attributes: ["valueEn", "valueVi"],
+              attributes: ["valueEN", "valueVI"],
             },
           ],
           raw: true,
