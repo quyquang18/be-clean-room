@@ -7,11 +7,13 @@ import viewEngine from "./config/viewEngine";
 import initWebRoutes from './route/web';
 import connectDB from "./config/connectDB";
 let app = express();
-app.use(
-  cors({
-    origin: "*",
-  })
-);
+const corsConfig = {
+  origin: "*",
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
+};
+app.use(cors(corsConfig));
 //config app
 
 // app.use(bodyParser.json());
