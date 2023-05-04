@@ -86,8 +86,8 @@ let createNewValueSensor = (data) => {
           dust25: data.dust2_5,
           pressIn: data.press_in,
           pressOut: data.press_out,
+          oxy: data.oxy,
           date: date,
-          time: data.time,
           roomId: data.roomId,
           userId: data.userId,
         });
