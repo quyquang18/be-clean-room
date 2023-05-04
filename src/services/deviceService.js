@@ -55,6 +55,7 @@ const getAllDeviceInRoom = (inputData) => {
         });
       }
     } catch (error) {
+      console.log(error);
       reject(error);
     }
   });
@@ -85,6 +86,7 @@ const getAllDeviceByUser = (userId) => {
         });
       }
     } catch (error) {
+      console.log(error);
       reject(error);
     }
   });
@@ -169,6 +171,7 @@ let createNewDevice = (inputData) => {
         }
       }
     } catch (error) {
+      console.log(error);
       reject(error);
     }
   });
@@ -195,6 +198,7 @@ const getLocation = (userId) => {
         });
       }
     } catch (error) {
+      console.log(error);
       reject(error);
     }
   });
@@ -219,6 +223,7 @@ let deleteDevice = (deviceId) => {
         message: `The device is deleted`,
       });
     } catch (error) {
+      console.log(error);
       reject(error);
     }
   });
@@ -239,9 +244,9 @@ const getStatusDevice = (inputData) => {
           const endTime = dateObj.endOf(inputData.type).valueOf();
           data = await db.statusDevice.findAll({
             where: {
-              userId: inputData.userId,
-              roomId: inputData.roomId,
-              deviceId: inputData.deviceId,
+              userId: +inputData.userId,
+              roomId: +inputData.roomId,
+              deviceId: +inputData.deviceId,
               date: {
                 [Op.between]: [startTime, endTime],
               },
@@ -278,6 +283,7 @@ const getStatusDevice = (inputData) => {
         });
       }
     } catch (error) {
+      console.log(error);
       reject(error);
     }
   });
@@ -358,6 +364,7 @@ let createNewStatusDevice = (inputData) => {
         }
       }
     } catch (error) {
+      console.log(error);
       reject(error);
     }
   });
