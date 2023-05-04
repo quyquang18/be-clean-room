@@ -18,9 +18,9 @@ module.exports = (sequelize, DataTypes) => {
   statusDevice.init(
     {
       status: DataTypes.STRING,
-      date: DataTypes.STRING,
-      stateStartTime: DataTypes.STRING,
-      stateEndTime: DataTypes.STRING,
+      date: DataTypes.BIGINT,
+      stateStartTime: DataTypes.BIGINT,
+      stateEndTime: DataTypes.BIGINT,
       deviceId: DataTypes.INTEGER,
       roomId: DataTypes.INTEGER,
       userId: DataTypes.INTEGER,

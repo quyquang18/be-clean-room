@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
       pressIn: DataTypes.STRING,
       pressOut: DataTypes.STRING,
       oxy: DataTypes.STRING,
-      date: DataTypes.STRING,
+      date: DataTypes.BIGINT,
       roomId: DataTypes.INTEGER,
       userId: DataTypes.INTEGER,
     },
