@@ -1,6 +1,6 @@
 import moment from "moment";
 import db from "../models/index";
-const { Sequelize, Op } = require("sequelize");
+const { Op } = require("sequelize");
 const updateDevice = (inputData) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -254,6 +254,7 @@ const getStatusDevice = (inputData) => {
             attributes: {
               exclude: ["createdAt", "updatedAt"],
             },
+            order: [["stateStartTime", "ASC"]],
             raw: true,
           });
         }
@@ -273,7 +274,15 @@ const getStatusDevice = (inputData) => {
             attributes: {
               exclude: ["createdAt", "updatedAt"],
             },
+            order: [["stateStartTime", "ASC"]],
             raw: true,
+          });
+        }
+        if (data && data.length > 0) {
+          data.map((item) => {
+            if (+item.stateEndTime === 0) {
+              item.stateEndTime = "" + new Date().getTime();
+            }
           });
         }
         resolve({
@@ -302,34 +311,34 @@ const getStatusDevice = (inputData) => {
 let createNewStatusDevice = (inputData) => {
   return new Promise(async (resolve, reject) => {
     try {
-      if (!inputData.userId || !inputData.roomId || !inputData.deviceId || !inputData.status || !inputData.date) {
+      if (!inputData.userId || !inputData.roomId || !inputData.deviceId || !inputData.status) {
         resolve({
           errCode: 1,
           message: "Missing required parameter",
         });
       } else {
-        const date = moment(new Date(+inputData.date)).startOf("date").valueOf();
+        let date = moment(new Date()).utcOffset("+07:00").startOf("day").valueOf();
+        let time = new Date().getTime();
         let check = await db.statusDevice.findOne({
           where: {
             deviceId: +inputData.deviceId,
             roomId: +inputData.roomId,
             userId: +inputData.userId,
             date: date,
-            stateEndTime: "0000000000000",
+            stateEndTime: 0,
           },
           raw: false,
         });
-        console.log(check);
         if (check) {
           if (check.status === inputData.status) {
-            check.stateEndTime = inputData.date;
+            check.stateEndTime = time;
             await check.save();
             resolve({
               errCode: 0,
-              message: "update status end time successful 1",
+              message: "update status end time successful",
             });
           } else {
-            check.stateEndTime = inputData.date;
+            check.stateEndTime = time;
             await check.save();
 
             let statusDevice = await db.statusDevice.create({
@@ -337,9 +346,9 @@ let createNewStatusDevice = (inputData) => {
               roomId: +inputData.roomId,
               userId: +inputData.userId,
               status: inputData.status,
-              stateStartTime: inputData.date,
+              stateStartTime: time,
               date: date,
-              stateEndTime: "0000000000000",
+              stateEndTime: 0,
             });
             resolve({
               errCode: 0,
@@ -352,9 +361,9 @@ let createNewStatusDevice = (inputData) => {
             roomId: +inputData.roomId,
             userId: +inputData.userId,
             status: inputData.status,
-            stateStartTime: inputData.date,
+            stateStartTime: time,
             date: date,
-            stateEndTime: "0000000000000",
+            stateEndTime: 0,
           });
           resolve({
             errCode: 0,

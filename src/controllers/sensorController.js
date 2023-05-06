@@ -12,7 +12,6 @@ let getValueSensorByTime = async (req, res) => {
 };
 let handlePostDataFromEsp32 = async (req, res) => {
   let data = req.body;
-  console.log(data);
   try {
     let info = await sensorService.createNewValueSensor(data);
     return res.status(200).json(info);

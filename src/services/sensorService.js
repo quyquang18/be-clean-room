@@ -14,7 +14,6 @@ let getValueSensorByTime = (inputData) => {
           const dateObj = moment(new Date(+inputData.date)).utcOffset("+07:00");
           const startTime = dateObj.startOf(inputData.type).valueOf();
           const endTime = dateObj.endOf(inputData.type).valueOf();
-          console.log(startTime, endTime);
           let resData = await db.valueSensor.findAll({
             where: {
               roomId: +inputData.roomId,
@@ -26,7 +25,6 @@ let getValueSensorByTime = (inputData) => {
             order: [["date", "ASC"]],
             raw: true,
           });
-          console.log(resData);
           if (!resData) resData = {};
           resolve({
             errCode: 0,
@@ -38,7 +36,6 @@ let getValueSensorByTime = (inputData) => {
         let inputDate = inputData.date.split(",");
         const startTime = moment(new Date(+inputDate[0])).utcOffset("+07:00").startOf("date").valueOf();
         const endTime = moment(new Date(+inputDate[1])).utcOffset("+07:00").endOf("date").valueOf();
-        console.log(startTime, endTime);
         let resData = await db.valueSensor.findAll({
           where: {
             roomId: +inputData.roomId,
