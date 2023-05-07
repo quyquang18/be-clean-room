@@ -101,7 +101,81 @@ let createNewValueSensor = (data) => {
     }
   });
 };
+let getValueThreshold = (inputData) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!inputData.Type_sensor || !inputData.roomId || !inputData.userId) {
+        resolve({
+          errCode: 1,
+          data: "Missing required parameter",
+        });
+      } else {
+        let data = await db.Threshold_value.create({
+          roomId: inputData.roomId,
+          userId: inputData.userId,
+          Type_sensor: inputData.Type_sensor,
+        });
+        if (!data) data = {};
+        resolve({
+          errCode: 0,
+          message: "ok",
+          data: data,
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      reject(error);
+    }
+  });
+};
+let updateValueThreshold = (inputData) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!inputData.Type_sensor || !inputData.roomId || !inputData.userId || !inputData.valueUp || !inputData.valueDown) {
+        resolve({
+          errCode: 1,
+          data: "Missing required parameter",
+        });
+      } else {
+        let [valueThres, created] = await db.Threshold_value.findOrCreate({
+          where: {
+            userId: inputData.userId,
+            roomId: inputData.roomId,
+            Type_sensor: inputData.Type_sensor,
+          },
+          defaults: {
+            userId: inputData.userId,
+            roomId: inputData.roomId,
+            Type_sensor: inputData.Type_sensor,
+            valueUp: inputData.valueUp,
+            valueDown: inputData.valueDown,
+          },
+          raw: false,
+        });
+        if (created) {
+          resolve({
+            errCode: 0,
+            message: "Create New value threshold Succeed !",
+          });
+        }
+        if (!created) {
+          valueThres.valueUp = inputData.valueUp;
+          valueThres.valueDown = inputData.valueDown;
+          valueThres.save();
+          resolve({
+            errCode: 0,
+            message: "update value threshold succeed !",
+          });
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      reject(error);
+    }
+  });
+};
 module.exports = {
   getValueSensorByTime: getValueSensorByTime,
-  createNewValueSensor: createNewValueSensor,
+  updateValueThreshold: updateValueThreshold,
+  getValueThreshold: getValueThreshold,
 };

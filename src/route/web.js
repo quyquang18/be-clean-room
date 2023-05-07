@@ -22,6 +22,8 @@ let initWebRoutes = (app) => {
 
   router.get("/api/get-value-sensor-by-date", sensorControler.getValueSensorByTime);
   router.post("/api/post-data-esp32", sensorControler.handlePostDataFromEsp32);
+  router.get("/api/get-value-threshold", sensorControler.getValueThreshold);
+  router.post("/api/update-value-threshold", sensorControler.updateValueThreshold);
 
   router.get("/api/get-device-in-room", deviceController.getAllDeviceInRoom);
   router.get("/api/get-all-device", deviceController.getAllDeviceByUser);
