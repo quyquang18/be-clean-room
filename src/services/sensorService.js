@@ -110,10 +110,12 @@ let getValueThreshold = (inputData) => {
           data: "Missing required parameter",
         });
       } else {
-        let data = await db.Threshold_value.create({
-          roomId: inputData.roomId,
-          userId: inputData.userId,
-          Type_sensor: inputData.Type_sensor,
+        let data = await db.Threshold_value.findOne({
+          where: {
+            roomId: inputData.roomId,
+            userId: inputData.userId,
+            Type_sensor: inputData.Type_sensor,
+          },
         });
         if (!data) data = {};
         resolve({
