@@ -182,4 +182,5 @@ module.exports = {
   getValueSensorByTime: getValueSensorByTime,
   updateValueThreshold: updateValueThreshold,
   getValueThreshold: getValueThreshold,
+  createNewValueSensor: createNewValueSensor,
 };
