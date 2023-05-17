@@ -1,5 +1,5 @@
 import userServices from '../services/userService'
-
+require("dotenv").config();
 let handleLogin = async (req, res) => {
   let email = req.body.email;
   let password = req.body.password;
@@ -10,6 +10,8 @@ let handleLogin = async (req, res) => {
     });
   } else {
     let userData = await userServices.handleUserLogin(email, password);
+    let optionsCookie = { httpOnly: false, sameSite: "None", secure: true, maxAge: 24 * 60 * 60 * 1000 };
+    res.cookie("user_role", userData.refreshToken, optionsCookie, { domain: process.env.URL_REACT });
     return res.status(200).json(userData);
   }
 };

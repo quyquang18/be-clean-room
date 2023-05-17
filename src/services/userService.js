@@ -2,7 +2,10 @@ import db from '../models/index'
 import bcrypt from 'bcryptjs'
 const crypto = require("crypto");
 const { Sequelize, Op } = require("sequelize");
-import emailService from './emailService'
+import jwt from "jsonwebtoken";
+require("dotenv").config();
+import emailService from "./emailService";
+
 const salt = bcrypt.genSaltSync(10);
 
 let handleUserLogin = (email, password) => {
@@ -23,8 +26,13 @@ let handleUserLogin = (email, password) => {
               userData.errCode = 4;
               userData.message = "Your account has not been verified. Please verify your account to continue";
             } else {
+              let accessToken = jwt.sign({ userId: user.id, role: user.roleID }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "30s" });
+              let refreshToken = jwt.sign({ userId: user.id, role: user.roleID }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: "1d" });
+
               userData.errCode = 0;
               userData.message = "Ok";
+              userData.accessToken = accessToken;
+              userData.refreshToken = refreshToken;
               if (user && user.image) {
                 user.image = new Buffer(user.image, "base64").toString("binary");
               }

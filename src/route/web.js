@@ -3,6 +3,7 @@ import userController from "../controllers/userController"
 import deviceController from "../controllers/deviceController"
 import roomControler from "../controllers/roomControler";
 import sensorControler from "../controllers/sensorController";
+import verifyUSer from "../controllers/verifyUser";
 let router = express.Router();
 
 let initWebRoutes = (app) => {
@@ -17,7 +18,7 @@ let initWebRoutes = (app) => {
   router.get("/api/get-detail-user-by-id", userController.getDetailUserById);
 
   router.post("/api/create-new-room", roomControler.createNewRoom);
-  router.get("/api/get-all-room/", roomControler.getAllRoom);
+  router.get("/api/get-all-room/", verifyUSer.verifyToken, roomControler.getAllRoom);
   router.get("/api/get-detail-room-by-id", roomControler.getDetailRoomById);
 
   router.get("/api/get-value-sensor-by-date", sensorControler.getValueSensorByTime);

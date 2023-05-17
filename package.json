@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "babel-node": "babel-node --presets=latest",
     "start": "nodemon --exec babel-node src/server.js",
-    "build-src": "babel src -d build --coppy-files"
+    "build-src": "babel src -d build --copy-files",
+    "build": "node build/server.js"
   },
   "repository": {
     "type": "git",
@@ -16,7 +17,7 @@
   "keywords": [
     ""
   ],
-  "author": "",
+  "author": "quyquang",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
