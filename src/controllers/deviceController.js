@@ -12,9 +12,9 @@ const getAllDeviceInRoom = async (req, res) => {
     });
   }
 };
-const getAllDeviceByUser = async (req, res) => {
+const getAllDeviceByCompany = async (req, res) => {
   try {
-    let info = await deviceService.getAllDeviceByUser(req.query.userId);
+    let info = await deviceService.getAllDeviceByCompany(req.query.companyId);
     return res.status(200).json(info);
   } catch (error) {
     console.log(error);
@@ -49,19 +49,7 @@ const handleCreateNewDevice = async (req, res) => {
     });
   }
 };
-const handleGetLocation = async (req, res) => {
-  let userId = req.query.id;
-  try {
-    let info = await deviceService.getLocation(userId);
-    return res.status(200).json(info);
-  } catch (error) {
-    console.log(error);
-    return res.status(200).json({
-      errCode: -1,
-      message: "Error From the Server",
-    });
-  }
-};
+
 let handleDeleteDevice = async (req, res) => {
   if (!req.query.id) {
     return res.status(500).json({
@@ -102,9 +90,8 @@ module.exports = {
   getAllDeviceInRoom: getAllDeviceInRoom,
   handleUpdateDevice: handleUpdateDevice,
   handleCreateNewDevice: handleCreateNewDevice,
-  handleGetLocation: handleGetLocation,
   handleDeleteDevice: handleDeleteDevice,
   handleGetStatusDevice: handleGetStatusDevice,
   handleCreateNewStatusDevice: handleCreateNewStatusDevice,
-  getAllDeviceByUser: getAllDeviceByUser,
+  getAllDeviceByCompany: getAllDeviceByCompany,
 };

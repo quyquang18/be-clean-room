@@ -25,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
       deviceName: DataTypes.STRING,
       typeDevice: DataTypes.STRING,
       roomId: DataTypes.INTEGER,
-      userId: DataTypes.INTEGER,
+      companyId: DataTypes.INTEGER,
     },
     {
       sequelize,

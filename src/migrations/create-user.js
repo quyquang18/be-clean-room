@@ -8,6 +8,9 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
+      companyId: {
+        type: Sequelize.INTEGER,
+      },
       email: {
         type: Sequelize.STRING,
       },
@@ -20,7 +23,10 @@ module.exports = {
       phonenumber: {
         type: Sequelize.STRING,
       },
-      verifed: {
+      userVerified: {
+        type: Sequelize.BOOLEAN,
+      },
+      companyVerified: {
         type: Sequelize.BOOLEAN,
       },
       roleID: {

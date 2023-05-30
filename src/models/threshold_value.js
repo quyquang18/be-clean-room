@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
   Threshold_value.init(
     {
       roomId: DataTypes.INTEGER,
-      userId: DataTypes.INTEGER,
+      companyId: DataTypes.INTEGER,
       Type_sensor: DataTypes.STRING,
       valueUp: DataTypes.STRING,
       valueDown: DataTypes.STRING,

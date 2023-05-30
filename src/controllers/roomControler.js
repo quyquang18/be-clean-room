@@ -13,7 +13,7 @@ let createNewRoom = async (req, res) => {
 };
 let getAllRoom = async (req, res) => {
   try {
-    let response = await roomService.getAllRoom(+req.query.userId);
+    let response = await roomService.getAllRoom(+req.query.companyId);
     return res.status(200).json(response);
   } catch (error) {
     return res.status(200).json({

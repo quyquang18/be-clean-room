@@ -23,10 +23,10 @@ module.exports = {
           deviceId: {
             type: Sequelize.INTEGER,
           },
-          locationID: {
+          roomId: {
             type: Sequelize.INTEGER,
           },
-          userId: {
+          companyId: {
             type: Sequelize.INTEGER,
           },
           createdAt: {

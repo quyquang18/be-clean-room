@@ -11,7 +11,7 @@ module.exports = {
       roomId: {
         type: Sequelize.INTEGER,
       },
-      userId: {
+      companyId: {
         type: Sequelize.INTEGER,
       },
       Type_sensor: {
@@ -21,6 +21,9 @@ module.exports = {
         type: Sequelize.STRING,
       },
       valueDown: {
+        type: Sequelize.STRING,
+      },
+      unit: {
         type: Sequelize.STRING,
       },
       createdAt: {

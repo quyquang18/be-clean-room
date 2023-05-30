@@ -23,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
       stateEndTime: DataTypes.BIGINT,
       deviceId: DataTypes.INTEGER,
       roomId: DataTypes.INTEGER,
-      userId: DataTypes.INTEGER,
+      companyId: DataTypes.INTEGER,
     },
     {
       sequelize,

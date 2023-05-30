@@ -4,7 +4,7 @@ import moment from "moment";
 let getValueSensorByTime = (inputData) => {
   return new Promise(async (resolve, reject) => {
     try {
-      if (!inputData.roomId || !inputData.userId || !inputData.date || !inputData.type) {
+      if (!inputData.roomId || !inputData.companyId || !inputData.date || !inputData.type) {
         resolve({
           errCode: 1,
           data: "Missing required parameter",
@@ -17,7 +17,7 @@ let getValueSensorByTime = (inputData) => {
           let resData = await db.valueSensor.findAll({
             where: {
               roomId: +inputData.roomId,
-              userId: +inputData.userId,
+              companyId: +inputData.companyId,
               date: {
                 [Op.between]: [startTime, endTime],
               },
@@ -39,7 +39,7 @@ let getValueSensorByTime = (inputData) => {
         let resData = await db.valueSensor.findAll({
           where: {
             roomId: +inputData.roomId,
-            userId: +inputData.userId,
+            companyId: +inputData.companyId,
             date: {
               [Op.between]: [startTime, endTime],
             },
@@ -70,7 +70,7 @@ let createNewValueSensor = (data) => {
         !data.press_in ||
         !data.press_out ||
         !data.oxy ||
-        !data.userId ||
+        !data.companyId ||
         !data.roomId
       ) {
         resolve({
@@ -84,12 +84,11 @@ let createNewValueSensor = (data) => {
           humidity: data.humidity,
           dust10: data.dust10,
           dust25: data.dust2_5,
-          pressIn: data.press_in,
-          pressOut: data.press_out,
+          differPress: data.differPress,
           oxy: data.oxy,
           date: date,
           roomId: data.roomId,
-          userId: data.userId,
+          companyId: data.companyId,
         });
         resolve({
           errCode: 0,
@@ -104,7 +103,7 @@ let createNewValueSensor = (data) => {
 let getValueThreshold = (inputData) => {
   return new Promise(async (resolve, reject) => {
     try {
-      if (!inputData.Type_sensor || !inputData.roomId || !inputData.userId) {
+      if (!inputData.Type_sensor || !inputData.roomId || !inputData.companyId) {
         resolve({
           errCode: 1,
           data: "Missing required parameter",
@@ -113,7 +112,7 @@ let getValueThreshold = (inputData) => {
         let data = await db.Threshold_value.findOne({
           where: {
             roomId: inputData.roomId,
-            userId: inputData.userId,
+            companyId: inputData.companyId,
             Type_sensor: inputData.Type_sensor,
           },
         });
@@ -133,7 +132,7 @@ let getValueThreshold = (inputData) => {
 let updateValueThreshold = (inputData) => {
   return new Promise(async (resolve, reject) => {
     try {
-      if (!inputData.Type_sensor || !inputData.roomId || !inputData.userId || !inputData.valueUp || !inputData.valueDown || !inputData.init) {
+      if (!inputData.Type_sensor || !inputData.roomId || !inputData.companyId || !inputData.valueUp || !inputData.valueDown || !inputData.init) {
         resolve({
           errCode: 1,
           data: "Missing required parameter",
@@ -141,12 +140,12 @@ let updateValueThreshold = (inputData) => {
       } else {
         let [valueThres, created] = await db.Threshold_value.findOrCreate({
           where: {
-            userId: inputData.userId,
+            companyId: inputData.companyId,
             roomId: inputData.roomId,
             Type_sensor: inputData.Type_sensor,
           },
           defaults: {
-            userId: inputData.userId,
+            companyId: inputData.companyId,
             roomId: inputData.roomId,
             Type_sensor: inputData.Type_sensor,
             valueUp: inputData.valueUp,

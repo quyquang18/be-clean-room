@@ -20,10 +20,7 @@ module.exports = {
           dust10: {
             type: Sequelize.STRING,
           },
-          pressIn: {
-            type: Sequelize.STRING,
-          },
-          pressOut: {
+          differPressure: {
             type: Sequelize.STRING,
           },
           oxy: {
@@ -35,10 +32,10 @@ module.exports = {
           time: {
             type: Sequelize.BIGINT,
           },
-          locationID: {
+          roomId: {
             type: Sequelize.INTEGER,
           },
-          userId: {
+          companyId: {
             type: Sequelize.INTEGER,
           },
           createdAt: {

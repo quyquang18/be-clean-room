@@ -11,7 +11,7 @@ let handleLogin = async (req, res) => {
   } else {
     let userData = await userServices.handleUserLogin(email, password);
     let optionsCookie = { httpOnly: false, sameSite: "None", secure: true, maxAge: 24 * 60 * 60 * 1000 };
-    res.cookie("user_role", userData.refreshToken, optionsCookie, { domain: process.env.URL_REACT });
+    res.cookie("user_role", userData.accessToken, optionsCookie, { domain: process.env.URL_REACT });
     return res.status(200).json(userData);
   }
 };
@@ -33,6 +33,10 @@ let handleGetAllUsers = async (req, res) => {
 };
 let handleCreateNewUser = async (req, res) => {
   let message = await userServices.createNewUser(req.body);
+  return res.status(200).json(message);
+};
+let handleCreateNewCompany = async (req, res) => {
+  let message = await userServices.handleCreateNewCompany(req.body);
   return res.status(200).json(message);
 };
 let handleDeleteUser = async (req, res) => {
@@ -96,6 +100,50 @@ let getDetailUserById = async (req, res) => {
     });
   }
 };
+let handleGetListCompany = async (req, res) => {
+  try {
+    let infor = await userServices.handleGetListCompany(req.query.type);
+    return res.status(200).json(infor);
+  } catch (error) {
+    return res.status(200).json({
+      errCode: -1,
+      message: "Error from server",
+    });
+  }
+};
+let handleConfirmCompany = async (req, res) => {
+  try {
+    let data = await userServices.handleConfirmCompany(req.body);
+    return res.status(200).json(data);
+  } catch (error) {
+    return res.status(200).json({
+      errCode: -1,
+      message: "Error from server",
+    });
+  }
+};
+let handleConfirmUserByCompany = async (req, res) => {
+  try {
+    let data = await userServices.handleConfirmUserByCompany(req.body);
+    return res.status(200).json(data);
+  } catch (error) {
+    return res.status(200).json({
+      errCode: -1,
+      message: "Error from server",
+    });
+  }
+};
+let getAllUserByCompany = async (req, res) => {
+  try {
+    let data = await userServices.getAllUserByCompany(req.query.companyId);
+    return res.status(200).json(data);
+  } catch (error) {
+    return res.status(200).json({
+      errCode: -1,
+      message: "Error from server",
+    });
+  }
+};
 
 module.exports = {
   handleLogin: handleLogin,
@@ -107,4 +155,9 @@ module.exports = {
   handleSendEmailWarning: handleSendEmailWarning,
   handeGetAllCode: handeGetAllCode,
   getDetailUserById: getDetailUserById,
+  handleCreateNewCompany: handleCreateNewCompany,
+  handleGetListCompany: handleGetListCompany,
+  handleConfirmCompany: handleConfirmCompany,
+  getAllUserByCompany: getAllUserByCompany,
+  handleConfirmUserByCompany: handleConfirmUserByCompany,
 };

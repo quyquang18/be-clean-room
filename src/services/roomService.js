@@ -3,7 +3,7 @@ import db from "../models/index";
 let createNewRoom = (inputData) => {
   return new Promise(async (resolve, reject) => {
     try {
-      if (!inputData.name || !inputData.userId || !inputData.actions) {
+      if (!inputData.name || !inputData.companyId || !inputData.actions) {
         resolve({
           errCode: 1,
           message: "Missing required parameter",
@@ -12,7 +12,7 @@ let createNewRoom = (inputData) => {
         if (inputData.actions === "CREATE") {
           await db.Room.create({
             name: inputData.name,
-            userId: inputData.userId,
+            companyId: inputData.companyId,
           });
           resolve({
             errCode: 0,
@@ -39,17 +39,17 @@ let createNewRoom = (inputData) => {
     }
   });
 };
-let getAllRoom = (userId) => {
+let getAllRoom = (companyId) => {
   return new Promise(async (resolve, reject) => {
     try {
-      if (!userId) {
+      if (!companyId) {
         resolve({
           errCode: 1,
           message: "Missing required parameter",
         });
       } else {
         let data = await db.Room.findAll({
-          where: { userId: userId },
+          where: { companyId: companyId },
           raw: true,
         });
         resolve({

@@ -1,7 +1,7 @@
 import db from '../models/index'
 import bcrypt from 'bcryptjs'
 const crypto = require("crypto");
-const { Sequelize, Op } = require("sequelize");
+const { Op } = require("sequelize");
 import jwt from "jsonwebtoken";
 require("dotenv").config();
 import emailService from "./emailService";
@@ -15,34 +15,69 @@ let handleUserLogin = (email, password) => {
       let isExist = await checkUserEmail(email);
       if (isExist) {
         let user = await db.User.findOne({
-          attributes: ["email", "username", "roleID", "password", "verifed", "id", "image"],
+          attributes: ["email", "username", "roleID", "password", "userVerified", "companyVerified", "id", "image", "companyId"],
           where: { email: email },
           raw: true,
         });
         if (user) {
-          let checkPass = await bcrypt.compareSync(password, user.password);
-          if (checkPass) {
-            if (!user.verifed) {
-              userData.errCode = 4;
-              userData.message = "Your account has not been verified. Please verify your account to continue";
-            } else {
-              let accessToken = jwt.sign({ userId: user.id, role: user.roleID }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "30s" });
-              let refreshToken = jwt.sign({ userId: user.id, role: user.roleID }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: "1d" });
-
-              userData.errCode = 0;
-              userData.message = "Ok";
-              userData.accessToken = accessToken;
-              userData.refreshToken = refreshToken;
-              if (user && user.image) {
-                user.image = new Buffer(user.image, "base64").toString("binary");
+          if (user.roleID === "R3") {
+            let checkPass = await bcrypt.compareSync(password, user.password);
+            if (checkPass) {
+              if (!user.userVerified) {
+                userData.errCode = 4;
+                userData.message = "Your account has not been verified. Please verify your account to continue";
               }
-              delete user.password;
-              delete user.verifed;
-              userData.user = user;
+              if (!user.companyVerified) {
+                userData.errCode = 5;
+                userData.message =
+                  "Your account has not been verified by the company. Please contact the relevant department to verify your account to continue";
+              } else {
+                let accessToken = jwt.sign({ userId: user.id, role: user.roleID }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "30s" });
+                let refreshToken = jwt.sign({ userId: user.id, role: user.roleID }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: "1d" });
+
+                userData.errCode = 0;
+                userData.message = "Ok";
+                userData.accessToken = accessToken;
+                userData.refreshToken = refreshToken;
+                if (user && user.image) {
+                  user.image = new Buffer(user.image, "base64").toString("binary");
+                }
+                delete user.password;
+                delete user.userVerified;
+                delete user.companyVerified;
+                userData.user = user;
+              }
+            } else {
+              userData.errCode = 3;
+              userData.message = "Wrong password";
             }
-          } else {
-            userData.errCode = 3;
-            userData.message = "Wrong password";
+          }
+          if (user.roleID === "R2") {
+            let checkPass = await bcrypt.compareSync(password, user.password);
+            if (checkPass) {
+              if (!user.userVerified) {
+                userData.errCode = 4;
+                userData.message = "Your account has not been verified. Please verify your account to continue";
+              } else {
+                let accessToken = jwt.sign({ userId: user.id, role: user.roleID }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "30s" });
+                let refreshToken = jwt.sign({ userId: user.id, role: user.roleID }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: "1d" });
+
+                userData.errCode = 0;
+                userData.message = "Ok";
+                userData.accessToken = accessToken;
+                userData.refreshToken = refreshToken;
+                if (user && user.image) {
+                  user.image = new Buffer(user.image, "base64").toString("binary");
+                }
+                delete user.password;
+                delete user.userVerified;
+                delete user.companyVerified;
+                userData.user = user;
+              }
+            } else {
+              userData.errCode = 3;
+              userData.message = "Wrong password";
+            }
           }
         } else {
           userData.errCode = 2;
@@ -92,6 +127,9 @@ let getAllUsers = (userId) => {
       let users = "";
       if (userId === "ALL") {
         users = await db.User.findAll({
+          where: {
+            roleID: { [Op.not]: "R1" },
+          },
           attributes: {
             exclude: ["password"],
           },
@@ -106,6 +144,36 @@ let getAllUsers = (userId) => {
         });
       }
       resolve(users);
+    } catch (error) {
+      console.log(error);
+      reject(error);
+    }
+  });
+};
+let getAllUserByCompany = (companyId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!companyId) {
+        resolve({
+          errCode: 1,
+          message: "Missing required parameters",
+        });
+      } else {
+        let users = await db.User.findAll({
+          where: {
+            roleID: "R3",
+            companyId: companyId,
+          },
+          attributes: {
+            exclude: ["password"],
+          },
+        });
+        resolve({
+          errCode: 0,
+          message: "Succeed",
+          data: users,
+        });
+      }
     } catch (error) {
       console.log(error);
       reject(error);
@@ -128,7 +196,8 @@ let createNewUser = (data) => {
           username: data.username,
           password: hashPasswordFromBcrypt,
           phonenumber: data.phonenumber,
-          verifed: false,
+          companyId: data.companyId,
+          userVerified: false,
           roleID: "R3",
         });
         let token = await db.Token.create({
@@ -146,6 +215,63 @@ let createNewUser = (data) => {
           errCode: 0,
           message: "Successful registration.An email has been sent to your account, please verify",
         });
+      }
+    } catch (error) {
+      console.log(error);
+      reject(error);
+    }
+  });
+};
+let handleCreateNewCompany = (data) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!data.name || !data.email || !data.password || !data.phonenumber || !data.address) {
+        resolve({
+          errCode: 1,
+          message: "Missing required parameters",
+        });
+      } else {
+        let checkEmail = await checkUserEmail(data.email);
+        if (checkEmail) {
+          resolve({
+            errCode: 1,
+            message: "User email already exists please enter a new email address",
+          });
+        } else {
+          let hashPasswordFromBcrypt = await hashUserPassword(data.password);
+          let company = await db.Company.create({
+            name: data.name,
+            email: data.email,
+            address: data.address,
+            phonenumber: data.phonenumber,
+            userVerified: false,
+          });
+          console.log(company);
+          let user = await db.User.create({
+            email: data.email,
+            username: data.name,
+            password: hashPasswordFromBcrypt,
+            phonenumber: data.phonenumber,
+            userVerified: false,
+            companyId: company.id,
+            roleID: "R3",
+          });
+          let token = await db.Token.create({
+            token: crypto.randomBytes(32).toString("hex"),
+            userId: user.id,
+          });
+          const url = `${process.env.BASE_URL}user/${user.id}/verify/${token.token}`;
+          await emailService.sendSimpleEmail({
+            firstname: data.name,
+            receiverEmail: data.email,
+            username: data.name,
+            url: url,
+          });
+          resolve({
+            errCode: 0,
+            message: "Successful registration.An email has been sent to your account, please verify",
+          });
+        }
       }
     } catch (error) {
       console.log(error);
@@ -371,6 +497,102 @@ let getDetailUserById = (inputId) => {
     }
   });
 };
+let handleGetListCompany = (inputType) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!inputType) {
+        resolve({
+          errCode: 1,
+          message: "Missing required parameters",
+        });
+      } else {
+        let res = {};
+        if (inputType === "UNCONFIMRED") {
+          res = await db.Company.findAll({
+            where: { verifed: 0 },
+          });
+        }
+        if (inputType === "CONFIRMED") {
+          res = await db.Company.findAll({
+            where: { verifed: 1 },
+          });
+        }
+        resolve({
+          errCode: 0,
+          message: "Succeed",
+          data: res,
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      reject(error);
+    }
+  });
+};
+let handleConfirmCompany = (inputData) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!inputData.companyId) {
+        resolve({
+          errCode: 1,
+          message: "Missing required parameters",
+        });
+      } else {
+        let dataCompany = await db.Company.findOne({
+          where: { id: inputData.companyId },
+          raw: false,
+        });
+        if (dataCompany) {
+          dataCompany.verifed = 1;
+          dataCompany.save();
+        }
+        let dataUser = await db.User.findOne({
+          where: { companyId: inputData.companyId },
+          raw: false,
+        });
+        if (dataUser) {
+          dataUser.roleID = "R2";
+          dataUser.save();
+        }
+        resolve({
+          errCode: 0,
+          message: "Succeed",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      reject(error);
+    }
+  });
+};
+let handleConfirmUserByCompany = (inputData) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!inputData.companyId || !inputData.userId) {
+        resolve({
+          errCode: 1,
+          message: "Missing required parameters",
+        });
+      } else {
+        let dataUser = await db.User.findOne({
+          where: { id: inputData.userId, companyId: inputData.companyId },
+          raw: false,
+        });
+        if (dataUser) {
+          dataUser.companyVerified = 1;
+          dataUser.save();
+        }
+        resolve({
+          errCode: 0,
+          message: "Succeed",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      reject(error);
+    }
+  });
+};
 module.exports = {
   handleUserLogin: handleUserLogin,
   getAllUsers: getAllUsers,
@@ -381,4 +603,9 @@ module.exports = {
   sendEmailWarning: sendEmailWarning,
   getAllCodeService: getAllCodeService,
   getDetailUserById: getDetailUserById,
+  handleCreateNewCompany: handleCreateNewCompany,
+  handleGetListCompany: handleGetListCompany,
+  handleConfirmCompany: handleConfirmCompany,
+  getAllUserByCompany: getAllUserByCompany,
+  handleConfirmUserByCompany: handleConfirmUserByCompany,
 };

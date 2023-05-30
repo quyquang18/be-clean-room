@@ -39,14 +39,14 @@ const updateDevice = (inputData) => {
 const getAllDeviceInRoom = (inputData) => {
   return new Promise(async (resolve, reject) => {
     try {
-      if (!inputData.userId || !inputData.roomId) {
+      if (!inputData.companyId || !inputData.roomId) {
         resolve({
           errCode: 1,
           message: "Missing required parameter",
         });
       } else {
         let data = await db.Device.findAll({
-          where: { userId: inputData.userId, roomId: inputData.roomId },
+          where: { companyId: inputData.companyId, roomId: inputData.roomId },
           attributes: ["id", "deviceName"],
         });
         resolve({
@@ -60,17 +60,17 @@ const getAllDeviceInRoom = (inputData) => {
     }
   });
 };
-const getAllDeviceByUser = (userId) => {
+const getAllDeviceByCompany = (companyId) => {
   return new Promise(async (resolve, reject) => {
     try {
-      if (!userId) {
+      if (!companyId) {
         resolve({
           errCode: 1,
           message: "Missing required parameter",
         });
       } else {
         let data = await db.Device.findAll({
-          where: { userId: userId },
+          where: { companyId: companyId },
           include: [
             {
               model: db.Room,
@@ -94,7 +94,7 @@ const getAllDeviceByUser = (userId) => {
 let createNewDevice = (inputData) => {
   return new Promise(async (resolve, reject) => {
     try {
-      if (!inputData.userId || !inputData.deviceName || !inputData.typeDevice || !inputData.mode) {
+      if (!inputData.companyId || !inputData.deviceName || !inputData.typeDevice || !inputData.mode) {
         resolve({
           errCode: 1,
           message: "Missing required parameter",
@@ -103,13 +103,13 @@ let createNewDevice = (inputData) => {
         if (inputData.mode === "UPDATE") {
           let [device, created] = await db.Device.findOrCreate({
             where: {
-              userId: inputData.userId,
+              companyId: inputData.companyId,
               roomId: inputData.roomId,
               typeDevice: inputData.typeDevice,
               deviceName: inputData.deviceName,
             },
             defaults: {
-              userId: inputData.userId,
+              companyId: inputData.companyId,
               roomId: inputData.roomId,
               deviceName: inputData.deviceName,
               typeDevice: inputData.typeDevice,
@@ -135,11 +135,11 @@ let createNewDevice = (inputData) => {
           let [room, createdRoom] = await db.Room.findOrCreate({
             where: {
               name: inputData.roomName,
-              userId: inputData.userId,
+              companyId: inputData.companyId,
             },
             defaults: {
               name: inputData.roomName,
-              userId: inputData.userId,
+              companyId: inputData.companyId,
             },
             raw: true,
           });
@@ -148,7 +148,7 @@ let createNewDevice = (inputData) => {
               deviceName: inputData.deviceName,
               typeDevice: inputData.typeDevice,
               roomId: room._previousDataValues.id,
-              userId: inputData.userId,
+              companyId: inputData.companyId,
             });
             resolve({
               errCode: 0,
@@ -160,7 +160,7 @@ let createNewDevice = (inputData) => {
               deviceName: inputData.deviceName,
               typeDevice: inputData.typeDevice,
               roomId: room.id,
-              userId: inputData.userId,
+              companyId: inputData.companyId,
             });
             resolve({
               errCode: 0,
@@ -177,32 +177,6 @@ let createNewDevice = (inputData) => {
   });
 };
 
-const getLocation = (userId) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      if (!userId) {
-        resolve({
-          errCode: 1,
-          message: "Missing required parameter",
-        });
-      } else {
-        let data = await db.Location.findAll({
-          where: { userId: userId },
-          attributes: {
-            exclude: ["createdAt", "updatedAt", "userId"],
-          },
-        });
-        resolve({
-          errCode: 0,
-          data: data,
-        });
-      }
-    } catch (error) {
-      console.log(error);
-      reject(error);
-    }
-  });
-};
 let deleteDevice = (deviceId) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -231,7 +205,7 @@ let deleteDevice = (deviceId) => {
 const getStatusDevice = (inputData) => {
   return new Promise(async (resolve, reject) => {
     try {
-      if (!inputData.userId || !inputData.roomId || !inputData.deviceId || !inputData.date || !inputData.type) {
+      if (!inputData.companyId || !inputData.roomId || !inputData.deviceId || !inputData.date || !inputData.type) {
         resolve({
           errCode: 1,
           message: "Missing required parameter",
@@ -244,7 +218,7 @@ const getStatusDevice = (inputData) => {
           const endTime = dateObj.endOf(inputData.type).valueOf();
           data = await db.statusDevice.findAll({
             where: {
-              userId: +inputData.userId,
+              companyId: +inputData.companyId,
               roomId: +inputData.roomId,
               deviceId: +inputData.deviceId,
               date: {
@@ -264,7 +238,7 @@ const getStatusDevice = (inputData) => {
           const endTime = moment(new Date(+inputDate[1])).utcOffset("+07:00").endOf("date").valueOf();
           data = await db.statusDevice.findAll({
             where: {
-              userId: inputData.userId,
+              companyId: inputData.companyId,
               roomId: inputData.roomId,
               deviceId: inputData.deviceId,
               date: {
@@ -296,22 +270,11 @@ const getStatusDevice = (inputData) => {
     }
   });
 };
-// const countStatusTime = (date, start, end) => {
-//   let dateStart = date + " " + start;
-//   let dateEnd = date + " " + end;
-//   var diff = Math.abs(new Date(dateStart.replace(/-/g, "/")) - new Date(dateEnd.replace(/-/g, "/")));
 
-//   let seconds = diff / 1000;
-//   const hours = parseInt(seconds / 3600);
-//   seconds = seconds % 3600;
-//   const minutes = parseInt(seconds / 60);
-//   seconds = seconds % 60;
-//   return (hours < 10 ? "0" + hours : hours) + ":" + (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds);
-// };
 let createNewStatusDevice = (inputData) => {
   return new Promise(async (resolve, reject) => {
     try {
-      if (!inputData.userId || !inputData.roomId || !inputData.deviceId || !inputData.status) {
+      if (!inputData.companyId || !inputData.roomId || !inputData.deviceId || !inputData.status) {
         resolve({
           errCode: 1,
           message: "Missing required parameter",
@@ -323,7 +286,7 @@ let createNewStatusDevice = (inputData) => {
           where: {
             deviceId: +inputData.deviceId,
             roomId: +inputData.roomId,
-            userId: +inputData.userId,
+            companyId: +inputData.companyId,
             date: date,
             stateEndTime: 0,
           },
@@ -344,7 +307,7 @@ let createNewStatusDevice = (inputData) => {
             let statusDevice = await db.statusDevice.create({
               deviceId: +inputData.deviceId,
               roomId: +inputData.roomId,
-              userId: +inputData.userId,
+              companyId: +inputData.companyId,
               status: inputData.status,
               stateStartTime: time,
               date: date,
@@ -359,7 +322,7 @@ let createNewStatusDevice = (inputData) => {
           await db.statusDevice.create({
             deviceId: +inputData.deviceId,
             roomId: +inputData.roomId,
-            userId: +inputData.userId,
+            companyId: +inputData.companyId,
             status: inputData.status,
             stateStartTime: time,
             date: date,
@@ -377,43 +340,11 @@ let createNewStatusDevice = (inputData) => {
     }
   });
 };
-// const createNewStatusDevice = (inputData) => {
-//   return new Promise(async () => {
-//     try {
-//       if (!inputData.userId || !inputData.roomId || !inputData.deviceId || !inputData.status || !inputData.date) {
-//         resolve({
-//           errCode: 1,
-//           message: "Missing required parameter",
-//         });
-//       } else {
-//         let data = await db.User.findOrCreate({
-//           where: {
-//             userId: inputData.userId,
-//             roomId: inputData.roomId,
-//             deviceId: inputData.deviceId,
-//             status: inputData.status,
-//           },
-//           defaults: {
-//             userId: inputData.userId,
-//             roomId: inputData.roomId,
-//             deviceId: inputData.deviceId,
-//             stateStartTime: inputData.date,
-//           },
-//           raw: true,
-//         });
-//       }
-//     } catch (error) {
-//       console.log(error);
-//       reject(error);
-//     }
-//   });
-// };
 module.exports = {
   getAllDeviceInRoom: getAllDeviceInRoom,
-  getAllDeviceByUser: getAllDeviceByUser,
+  getAllDeviceByCompany: getAllDeviceByCompany,
   updateDevice: updateDevice,
   createNewDevice: createNewDevice,
-  getLocation: getLocation,
   deleteDevice: deleteDevice,
   getStatusDevice: getStatusDevice,
   createNewStatusDevice: createNewStatusDevice,
