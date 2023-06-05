@@ -68,7 +68,92 @@ let getNotifycationByUserId = (inputData) => {
     }
   });
 };
+
+const sendNotificationsConfirmUser = async (username, companyId) => {
+  if (username || companyId) {
+    let user = await db.User.findAll({
+      where: {
+        companyId: companyId,
+        roleID: "R2",
+      },
+      attributes: ["id", "username", "companyId"],
+    });
+    if (user && user.length > 0) {
+      user.forEach(async (element) => {
+        let content = `Xin chào ${element.username} tài khoản ${username} vừa đăng kí thuộc công ty của bạn.Vui lòng xác nhận`;
+        let time = new Date().getTime();
+        await db.Notifycation.create({
+          userId: element.id,
+          companyId: element.companyId,
+          content: content,
+          type: "NT0",
+          time: time,
+          access_rights: "R2",
+          isRead: false,
+        });
+      });
+    }
+  }
+};
+const sendNotificationsWellcomeUser = async (username, companyId, userId) => {
+  if (username || userId || companyId) {
+    let content = `Chào mừng ${username} đến với trang quản lí thiết bị và giám sát phòng sạch của LUXAS. `;
+    let time = new Date().getTime();
+    await db.Notifycation.create({
+      userId: userId,
+      companyId: companyId,
+      content: content,
+      type: "NT0",
+      time: time,
+      access_rights: "R3",
+      isRead: false,
+    });
+  }
+};
+const sendNotificationsWarning = async (inputData) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (
+        !inputData.userId ||
+        !inputData.roomName ||
+        !inputData.companyId ||
+        !inputData.valueCurrent ||
+        !inputData.valueUp ||
+        !inputData.valueDown ||
+        !inputData.typeSensor
+      ) {
+        resolve({
+          errCode: 1,
+          message: "Missing required parameter",
+        });
+      } else {
+        let content = `Giá trị của ${inputData.typeSensor} trong phòng ${inputData.roomName} là  ${inputData.valueCurrent} nằm ngoài giá trị cho phép (từ ${inputData.valueDown} đến ${inputData.valueUp})`;
+        let time = new Date().getTime();
+        await db.Notifycation.create({
+          userId: inputData.userId,
+          companyId: inputData.companyId,
+          content: content,
+          type: "NT1",
+          time: time,
+          access_rights: "ALL",
+          isRead: false,
+        });
+
+        resolve({
+          errCode: 0,
+          message: "Ok",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      reject(error);
+    }
+  });
+};
 module.exports = {
   createNewNotifycation: createNewNotifycation,
   getNotifycationByUserId: getNotifycationByUserId,
+  sendNotificationsConfirmUser: sendNotificationsConfirmUser,
+  sendNotificationsWellcomeUser: sendNotificationsWellcomeUser,
+  sendNotificationsWarning: sendNotificationsWarning,
 };

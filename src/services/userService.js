@@ -5,7 +5,7 @@ const { Op } = require("sequelize");
 import jwt from "jsonwebtoken";
 require("dotenv").config();
 import emailService from "./emailService";
-
+import notifycationService from "../services/notifycationService";
 const salt = bcrypt.genSaltSync(10);
 
 let handleUserLogin = (email, password) => {
@@ -200,6 +200,8 @@ let createNewUser = (data) => {
           userVerified: false,
           roleID: "R3",
         });
+        await notifycationService.sendNotificationsConfirmUser(data.username, data.companyId);
+        await notifycationService.sendNotificationsWellcomeUser(data.username, data.companyId, user.id);
         let token = await db.Token.create({
           token: crypto.randomBytes(32).toString("hex"),
           userId: user.id,
@@ -246,7 +248,6 @@ let handleCreateNewCompany = (data) => {
             phonenumber: data.phonenumber,
             userVerified: false,
           });
-          console.log(company);
           let user = await db.User.create({
             email: data.email,
             username: data.name,
@@ -425,7 +426,7 @@ let verifyEmail = (inputId, inputToken) => {
           message: `Invalid link`,
         });
       }
-      user.verifed = true;
+      user.userVerified = true;
       await user.save();
       await db.Token.destroy({
         where: { userId: user.id },

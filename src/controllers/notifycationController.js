@@ -1,7 +1,7 @@
-import sensorService from "../services/notifycationService";
+import notifycationService from "../services/notifycationService";
 let createNewNotifycation = async (req, res) => {
   try {
-    let infor = await sensorService.createNewNotifycation(req.body);
+    let infor = await notifycationService.createNewNotifycation(req.body);
     return res.status(200).json(infor);
   } catch (error) {
     return res.status(200).json({
@@ -12,7 +12,18 @@ let createNewNotifycation = async (req, res) => {
 };
 let getNotifycationByUserId = async (req, res) => {
   try {
-    let infor = await sensorService.getNotifycationByUserId(req.query);
+    let infor = await notifycationService.getNotifycationByUserId(req.query);
+    return res.status(200).json(infor);
+  } catch (error) {
+    return res.status(200).json({
+      errCode: -1,
+      message: "Error from server",
+    });
+  }
+};
+let sendNotificationsWarning = async (req, res) => {
+  try {
+    let infor = await notifycationService.sendNotificationsWarning(req.body);
     return res.status(200).json(infor);
   } catch (error) {
     return res.status(200).json({
@@ -25,4 +36,5 @@ let getNotifycationByUserId = async (req, res) => {
 module.exports = {
   createNewNotifycation: createNewNotifycation,
   getNotifycationByUserId: getNotifycationByUserId,
+  sendNotificationsWarning: sendNotificationsWarning,
 };

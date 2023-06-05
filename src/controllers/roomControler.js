@@ -34,9 +34,33 @@ let getDetailRoomById = async (req, res) => {
     });
   }
 };
+let updateInfoRoom = async (req, res) => {
+  try {
+    let response = await roomService.updateInfoRoom(req.body);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(200).json({
+      errCode: -1,
+      message: "Error from server",
+    });
+  }
+};
+let deleteRoom = async (req, res) => {
+  try {
+    let response = await roomService.deleteRoom(req.body);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(200).json({
+      errCode: -1,
+      message: "Error from server",
+    });
+  }
+};
 
 module.exports = {
   createNewRoom: createNewRoom,
   getAllRoom: getAllRoom,
   getDetailRoomById: getDetailRoomById,
+  updateInfoRoom: updateInfoRoom,
+  deleteRoom: deleteRoom,
 };

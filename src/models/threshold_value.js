@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
       Type_sensor: DataTypes.STRING,
       valueUp: DataTypes.STRING,
       valueDown: DataTypes.STRING,
-      init: DataTypes.STRING,
+      unit: DataTypes.STRING,
     },
     {
       sequelize,

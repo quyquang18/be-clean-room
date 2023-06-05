@@ -96,6 +96,89 @@ let getDetailRoomById = (inputId) => {
         });
       }
     } catch (error) {
+      console.log(error);
+      reject(error);
+    }
+  });
+};
+let updateInfoRoom = (inputData) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!inputData.roomName || !inputData.roomId) {
+        resolve({
+          errCode: 1,
+          data: "Missing required parameter",
+        });
+      } else {
+        let data = await db.Room.findOne({
+          where: {
+            id: inputData.roomId,
+            companyId: inputData.companyId,
+          },
+          raw: false,
+        });
+        if (data) {
+          let resName = await db.Room.findOne({
+            where: {
+              name: inputData.roomName,
+              companyId: inputData.companyId,
+            },
+          });
+          if (!resName) {
+            data.name = inputData.roomName;
+            data.save();
+            resolve({
+              errCode: 0,
+              message: "Ok",
+            });
+          } else {
+            resolve({
+              errCode: 2,
+              message: "Room name already exists",
+            });
+          }
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      reject(error);
+    }
+  });
+};
+let deleteRoom = (inputData) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!inputData.roomId || !inputData.companyId) {
+        resolve({
+          errCode: 1,
+          data: "Missing required parameter",
+        });
+      } else {
+        let room = await db.Room.findOne({
+          where: {
+            id: inputData.roomId,
+            companyId: inputData.companyId,
+          },
+        });
+        if (!room) {
+          resolve({
+            errCode: 2,
+            message: `The room isn't exist`,
+          });
+        }
+        await db.Room.destroy({
+          where: {
+            id: inputData.roomId,
+            companyId: inputData.companyId,
+          },
+        });
+        resolve({
+          errCode: 0,
+          message: `The device is deleted`,
+        });
+      }
+    } catch (error) {
+      console.log(error);
       reject(error);
     }
   });
@@ -104,4 +187,6 @@ module.exports = {
   createNewRoom: createNewRoom,
   getAllRoom: getAllRoom,
   getDetailRoomById: getDetailRoomById,
+  updateInfoRoom: updateInfoRoom,
+  deleteRoom: deleteRoom,
 };

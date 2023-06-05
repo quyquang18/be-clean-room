@@ -25,10 +25,13 @@ let initWebRoutes = (app) => {
 
   router.post("/api/create-notifycation", notifycationController.createNewNotifycation);
   router.get("/api/get-notifycation", notifycationController.getNotifycationByUserId);
+  router.post("/api/send-notifications-warning", notifycationController.sendNotificationsWarning);
 
   router.post("/api/create-new-room", roomControler.createNewRoom);
   router.get("/api/get-all-room/", roomControler.getAllRoom);
   router.get("/api/get-detail-room-by-id", roomControler.getDetailRoomById);
+  router.post("/api/update-info-room", roomControler.updateInfoRoom);
+  router.post("/api/delete-room", roomControler.deleteRoom);
 
   router.get("/api/get-value-sensor-by-date", sensorControler.getValueSensorByTime);
   router.post("/api/post-data-esp32", sensorControler.handlePostDataFromEsp32);

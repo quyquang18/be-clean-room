@@ -132,7 +132,7 @@ let getValueThreshold = (inputData) => {
 let updateValueThreshold = (inputData) => {
   return new Promise(async (resolve, reject) => {
     try {
-      if (!inputData.Type_sensor || !inputData.roomId || !inputData.companyId || !inputData.valueUp || !inputData.valueDown || !inputData.init) {
+      if (!inputData.Type_sensor || !inputData.roomId || !inputData.companyId || !inputData.valueUp || !inputData.valueDown || !inputData.unit) {
         resolve({
           errCode: 1,
           data: "Missing required parameter",
@@ -150,7 +150,7 @@ let updateValueThreshold = (inputData) => {
             Type_sensor: inputData.Type_sensor,
             valueUp: inputData.valueUp,
             valueDown: inputData.valueDown,
-            init: inputData.init,
+            unit: inputData.unit,
           },
           raw: false,
         });
@@ -163,7 +163,7 @@ let updateValueThreshold = (inputData) => {
         if (!created) {
           valueThres.valueUp = inputData.valueUp;
           valueThres.valueDown = inputData.valueDown;
-          valueThres.init = inputData.init;
+          valueThres.unit = inputData.unit;
           valueThres.save();
           resolve({
             errCode: 0,
