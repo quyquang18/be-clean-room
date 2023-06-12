@@ -62,6 +62,9 @@ let handleDeleteDevice = async (req, res) => {
 };
 const handleGetStatusDevice = async (req, res) => {
   let data = req.query;
+  console.log("query:", req.query);
+  console.log("params:", req.params);
+  console.log("body:", req.body);
   try {
     let info = await deviceService.getStatusDevice(data);
     return res.status(200).json(info);
