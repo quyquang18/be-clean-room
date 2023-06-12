@@ -205,6 +205,7 @@ let deleteDevice = (deviceId) => {
 const getStatusDevice = (inputData) => {
   return new Promise(async (resolve, reject) => {
     try {
+      console.log(inputData);
       if (!inputData.companyId || !inputData.roomId || !inputData.deviceId || !inputData.date || !inputData.type) {
         resolve({
           errCode: 1,
