@@ -23,5 +23,6 @@ let port = process.env.PORT || 6969;
 
 app.listen(port, () => {
     //callback
+    console.log("---------------------");
     console.log("Backend Nodejs is runing on the port : " + port)
 })

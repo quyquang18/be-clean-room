@@ -3,7 +3,6 @@ import userController from "../controllers/userController"
 import deviceController from "../controllers/deviceController"
 import roomControler from "../controllers/roomControler";
 import sensorControler from "../controllers/sensorController";
-import verifyUSer from "../controllers/verifyUser";
 import notifycationController from "../controllers/notifycationController";
 let router = express.Router();
 

@@ -13,8 +13,7 @@ let sequelize;
 const custumizeConfig = {
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
-  dialect: "mysql",
-  // oracle: process.env.DDB_DATABASE_URL,
+  dialect: process.env.DB_DIALECT,
   logging: false,
   query: {
     raw: true,

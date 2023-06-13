@@ -79,6 +79,28 @@ let handleUserLogin = (email, password) => {
               userData.message = "Wrong password";
             }
           }
+          if (user.roleID === "R1") {
+            let checkPass = await bcrypt.compareSync(password, user.password);
+            if (checkPass) {
+              let accessToken = jwt.sign({ userId: user.id, role: user.roleID }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "30s" });
+              let refreshToken = jwt.sign({ userId: user.id, role: user.roleID }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: "1d" });
+
+              userData.errCode = 0;
+              userData.message = "Ok";
+              userData.accessToken = accessToken;
+              userData.refreshToken = refreshToken;
+              if (user && user.image) {
+                user.image = new Buffer(user.image, "base64").toString("binary");
+              }
+              delete user.password;
+              delete user.userVerified;
+              delete user.companyVerified;
+              userData.user = user;
+            } else {
+              userData.errCode = 3;
+              userData.message = "Wrong password";
+            }
+          }
         } else {
           userData.errCode = 2;
           userData.message = `User's not found~`;
@@ -206,7 +228,7 @@ let createNewUser = (data) => {
           token: crypto.randomBytes(32).toString("hex"),
           userId: user.id,
         });
-        const url = `${process.env.BASE_URL}user/${user.id}/verify/${token.token}`;
+        const url = `${process.env.URL_REACT}/user/${user.id}/verify/${token.token}`;
         await emailService.sendSimpleEmail({
           firstname: data.firstname,
           receiverEmail: data.email,
@@ -261,7 +283,7 @@ let handleCreateNewCompany = (data) => {
             token: crypto.randomBytes(32).toString("hex"),
             userId: user.id,
           });
-          const url = `${process.env.BASE_URL}user/${user.id}/verify/${token.token}`;
+          const url = `${process.env.URL_REACT}/user/${user.id}/verify/${token.token}`;
           await emailService.sendSimpleEmail({
             firstname: data.name,
             receiverEmail: data.email,
