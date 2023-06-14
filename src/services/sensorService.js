@@ -61,14 +61,14 @@ let getValueSensorByTime = (inputData) => {
 };
 let createNewValueSensor = (data) => {
   return new Promise(async (resolve, reject) => {
+    console.log(data);
     try {
       if (
         !data.temperature ||
         !data.humidity ||
         !data.dust2_5 ||
         !data.dust10 ||
-        !data.press_in ||
-        !data.press_out ||
+        !data.press_difference ||
         !data.oxy ||
         !data.companyId ||
         !data.roomId
@@ -84,7 +84,7 @@ let createNewValueSensor = (data) => {
           humidity: data.humidity,
           dust10: data.dust10,
           dust25: data.dust2_5,
-          differPress: data.differPress,
+          differPressure: data.press_difference,
           oxy: data.oxy,
           date: date,
           roomId: data.roomId,
