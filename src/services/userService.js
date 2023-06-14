@@ -84,21 +84,22 @@ let handleUserLogin = (email, password) => {
                   let refreshToken = jwt.sign({ userId: user.id, role: user.roleID }, process.env.REFRESH_TOKEN_SECRET, {
                     expiresIn: "1d",
                   });
+
+                  if (user && user.image) {
+                    user.image = new Buffer(user.image, "base64").toString("binary");
+                  }
+                  delete user.password;
+                  delete user.userVerified;
+                  delete user.companyVerified;
+                  resolve({
+                    errCode: 0,
+                    message: "Succeed",
+                    accessToken: accessToken,
+                    refreshToken: refreshToken,
+                    user: user,
+                  });
                 }
 
-                if (user && user.image) {
-                  user.image = new Buffer(user.image, "base64").toString("binary");
-                }
-                delete user.password;
-                delete user.userVerified;
-                delete user.companyVerified;
-                resolve({
-                  errCode: 0,
-                  message: "Succeed",
-                  accessToken: accessToken,
-                  refreshToken: refreshToken,
-                  user: user,
-                });
               }
             } else {
               resolve({
