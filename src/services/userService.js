@@ -24,59 +24,87 @@ let handleUserLogin = (email, password) => {
             let checkPass = await bcrypt.compareSync(password, user.password);
             if (checkPass) {
               if (!user.userVerified) {
-                userData.errCode = 4;
-                userData.message = "Your account has not been verified. Please verify your account to continue";
+                resolve({
+                  errCode: 2,
+                  message: "Your account has not been verified. Please verify your account to continue",
+                });
               }
               if (!user.companyVerified) {
-                userData.errCode = 5;
-                userData.message =
-                  "Your account has not been verified by the company. Please contact the relevant department to verify your account to continue";
+                resolve({
+                  errCode: 3,
+                  message:
+                    "Your account has not been verified by the company. Please contact the relevant department to verify your account to continue",
+                });
               } else {
                 let accessToken = jwt.sign({ userId: user.id, role: user.roleID }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "30s" });
                 let refreshToken = jwt.sign({ userId: user.id, role: user.roleID }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: "1d" });
 
-                userData.errCode = 0;
-                userData.message = "Ok";
-                userData.accessToken = accessToken;
-                userData.refreshToken = refreshToken;
                 if (user && user.image) {
                   user.image = new Buffer(user.image, "base64").toString("binary");
                 }
                 delete user.password;
                 delete user.userVerified;
                 delete user.companyVerified;
-                userData.user = user;
+                resolve({
+                  errCode: 0,
+                  message: "Succeed",
+                  accessToken: accessToken,
+                  refreshToken: refreshToken,
+                  user: user,
+                });
               }
             } else {
-              userData.errCode = 3;
-              userData.message = "Wrong password";
+              resolve({
+                errCode: 3,
+                message: "Wrong password",
+              });
             }
           }
           if (user.roleID === "R2") {
             let checkPass = await bcrypt.compareSync(password, user.password);
             if (checkPass) {
               if (!user.userVerified) {
-                userData.errCode = 4;
-                userData.message = "Your account has not been verified. Please verify your account to continue";
+                resolve({
+                  errCode: 4,
+                  message: "Your account has not been verified. Check Email for Verification",
+                });
               } else {
-                let accessToken = jwt.sign({ userId: user.id, role: user.roleID }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "30s" });
-                let refreshToken = jwt.sign({ userId: user.id, role: user.roleID }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: "1d" });
+                let company = await db.Company.findOne({
+                  where: { email: email },
+                  attributes: ["email", "verifed"],
+                  raw: true,
+                });
+                if (!company.verifed) {
+                  resolve({
+                    errCode: 5,
+                    message: "Your account has not been verified by Luxas. Please wait or contact Luxas for support",
+                  });
+                } else {
+                  let accessToken = jwt.sign({ userId: user.id, role: user.roleID }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "30s" });
+                  let refreshToken = jwt.sign({ userId: user.id, role: user.roleID }, process.env.REFRESH_TOKEN_SECRET, {
+                    expiresIn: "1d",
+                  });
+                }
 
-                userData.errCode = 0;
-                userData.message = "Ok";
-                userData.accessToken = accessToken;
-                userData.refreshToken = refreshToken;
                 if (user && user.image) {
                   user.image = new Buffer(user.image, "base64").toString("binary");
                 }
                 delete user.password;
                 delete user.userVerified;
                 delete user.companyVerified;
-                userData.user = user;
+                resolve({
+                  errCode: 0,
+                  message: "Succeed",
+                  accessToken: accessToken,
+                  refreshToken: refreshToken,
+                  user: user,
+                });
               }
             } else {
-              userData.errCode = 3;
-              userData.message = "Wrong password";
+              resolve({
+                errCode: 3,
+                message: "Wrong password",
+              });
             }
           }
           if (user.roleID === "R1") {
@@ -87,29 +115,38 @@ let handleUserLogin = (email, password) => {
 
               userData.errCode = 0;
               userData.message = "Ok";
-              userData.accessToken = accessToken;
-              userData.refreshToken = refreshToken;
               if (user && user.image) {
                 user.image = new Buffer(user.image, "base64").toString("binary");
               }
               delete user.password;
               delete user.userVerified;
               delete user.companyVerified;
-              userData.user = user;
+              resolve({
+                errCode: 0,
+                message: "Succeed",
+                accessToken: accessToken,
+                refreshToken: refreshToken,
+                user: user,
+              });
             } else {
-              userData.errCode = 3;
-              userData.message = "Wrong password";
+              resolve({
+                errCode: 3,
+                message: "Wrong password",
+              });
             }
           }
         } else {
-          userData.errCode = 2;
-          userData.message = `User's not found~`;
+          resolve({
+            errCode: 6,
+            message: "User's not found",
+          });
         }
       } else {
-        userData.errCode = 1;
-        userData.message = `Your's Email isn't exist in your system. Plz try other Email!`;
+        resolve({
+          errCode: 7,
+          message: "Your's Email isn't exist in your system. Plz try other Email!",
+        });
       }
-      resolve(userData);
     } catch (error) {
       console.log(error);
       reject(error);
