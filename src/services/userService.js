@@ -268,7 +268,7 @@ let handleCreateNewCompany = (data) => {
             email: data.email,
             address: data.address,
             phonenumber: data.phonenumber,
-            userVerified: false,
+            verifed: false,
           });
           let user = await db.User.create({
             email: data.email,
