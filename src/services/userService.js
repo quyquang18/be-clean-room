@@ -228,7 +228,7 @@ let createNewUser = (data) => {
           token: crypto.randomBytes(32).toString("hex"),
           userId: user.id,
         });
-        const url = `${process.env.URL_REACT}/user/${user.id}/verify/${token.token}`;
+        const url = `${process.env.URL_SEND_EMAIL}/user/${user.id}/verify/${token.token}`;
         await emailService.sendSimpleEmail({
           firstname: data.firstname,
           receiverEmail: data.email,
@@ -277,13 +277,13 @@ let handleCreateNewCompany = (data) => {
             phonenumber: data.phonenumber,
             userVerified: false,
             companyId: company.id,
-            roleID: "R3",
+            roleID: "R2",
           });
           let token = await db.Token.create({
             token: crypto.randomBytes(32).toString("hex"),
             userId: user.id,
           });
-          const url = `${process.env.URL_REACT}/user/${user.id}/verify/${token.token}`;
+          const url = `${process.env.URL_SEND_EMAIL}/user/${user.id}/verify/${token.token}`;
           await emailService.sendSimpleEmail({
             firstname: data.name,
             receiverEmail: data.email,
