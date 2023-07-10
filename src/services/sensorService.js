@@ -61,7 +61,6 @@ let getValueSensorByTime = (inputData) => {
 };
 let createNewValueSensor = (data) => {
   return new Promise(async (resolve, reject) => {
-    console.log(data);
     try {
       if (
         !data.temperature ||
@@ -79,7 +78,7 @@ let createNewValueSensor = (data) => {
         });
       } else {
         let date = new Date().getTime();
-        let valueSensor = await db.valueSensor.create({
+        await db.valueSensor.create({
           temperature: data.temperature,
           humidity: data.humidity,
           dust10: data.dust10,
@@ -90,6 +89,7 @@ let createNewValueSensor = (data) => {
           roomId: data.roomId,
           companyId: data.companyId,
         });
+
         resolve({
           errCode: 0,
           message: "ok",

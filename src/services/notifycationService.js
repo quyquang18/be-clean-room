@@ -3,8 +3,14 @@ const { Op } = require("sequelize");
 let createNewNotifycation = (inputData) => {
   return new Promise(async (resolve, reject) => {
     try {
-      console.log(inputData);
-      if (!inputData.userId || !inputData.companyId || !inputData.content || !inputData.type || !inputData.time || !inputData.access_rights) {
+      if (
+        !inputData.userId ||
+        !inputData.companyId ||
+        !inputData.content ||
+        !inputData.type ||
+        !inputData.time ||
+        !inputData.access_rights
+      ) {
         resolve({
           errCode: 1,
           message: "Missing required parameter",
@@ -60,6 +66,12 @@ let getNotifycationByUserId = (inputData) => {
             message: "Ok",
             data: data,
           });
+        } else {
+          resolve({
+            errCode: 2,
+            message: "user does not exist",
+            data: [],
+          });
         }
       }
     } catch (error) {
@@ -114,8 +126,7 @@ const sendNotificationsWarning = async (inputData) => {
   return new Promise(async (resolve, reject) => {
     try {
       if (
-        !inputData.userId ||
-        !inputData.roomName ||
+        !inputData.roomId ||
         !inputData.companyId ||
         !inputData.valueCurrent ||
         !inputData.valueUp ||
@@ -127,22 +138,36 @@ const sendNotificationsWarning = async (inputData) => {
           message: "Missing required parameter",
         });
       } else {
-        let content = `Giá trị của ${inputData.typeSensor} trong phòng ${inputData.roomName} là  ${inputData.valueCurrent} nằm ngoài giá trị cho phép (từ ${inputData.valueDown} đến ${inputData.valueUp})`;
-        let time = new Date().getTime();
-        await db.Notifycation.create({
-          userId: inputData.userId,
-          companyId: inputData.companyId,
-          content: content,
-          type: "NT1",
-          time: time,
-          access_rights: "ALL",
-          isRead: false,
+        let dataRoom = await db.Room.findOne({
+          where: {
+            id: inputData.roomId,
+          },
+          attributes: ["id", "name"],
         });
-
-        resolve({
-          errCode: 0,
-          message: "Ok",
-        });
+        console.log(dataRoom);
+        if (dataRoom) {
+          let content = `Giá trị của ${inputData.typeSensor} trong phòng ${dataRoom.name} là  ${inputData.valueCurrent} nằm ngoài giá trị cho phép (từ ${inputData.valueDown} đến ${inputData.valueUp})`;
+          let time = new Date().getTime();
+          await db.Notifycation.create({
+            userId: inputData.userId || null,
+            companyId: inputData.companyId,
+            content: content,
+            type: "NT1",
+            time: time,
+            access_rights: "ALL",
+            isRead: false,
+          });
+          resolve({
+            errCode: 0,
+            message: "Ok",
+          });
+        } else {
+          resolve({
+            errCode: 2,
+            message: "Room does not exist",
+            data: [],
+          });
+        }
       }
     } catch (error) {
       console.log(error);
