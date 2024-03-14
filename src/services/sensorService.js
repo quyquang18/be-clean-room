@@ -61,16 +61,17 @@ let getValueSensorByTime = (inputData) => {
 };
 let createNewValueSensor = (data) => {
   return new Promise(async (resolve, reject) => {
+    console.log(data);
     try {
       if (
         !data.temperature ||
         !data.humidity ||
-        !data.dust2_5 ||
-        !data.dust10 ||
-        !data.press_difference ||
+        !data.dust_pm_25 ||
+        !data.dust_pm_10 ||
+        !data.dif_pressure ||
         !data.oxy ||
         !data.companyId ||
-        !data.roomId
+        !data.deviceId
       ) {
         resolve({
           errCode: 1,
@@ -81,12 +82,12 @@ let createNewValueSensor = (data) => {
         await db.valueSensor.create({
           temperature: data.temperature,
           humidity: data.humidity,
-          dust10: data.dust10,
-          dust25: data.dust2_5,
-          differPressure: data.press_difference,
+          dust10: data.dust_pm_10,
+          dust25: data.dust_pm_25,
+          differPressure: data.dif_pressure,
           oxy: data.oxy,
           date: date,
-          roomId: data.roomId,
+          roomId: 3,
           companyId: data.companyId,
         });
 

@@ -1,5 +1,5 @@
-import db from '../models/index'
-import bcrypt from 'bcryptjs'
+import db from "../models/index";
+import bcrypt from "bcryptjs";
 const crypto = require("crypto");
 const { Op } = require("sequelize");
 import jwt from "jsonwebtoken";
@@ -15,11 +15,23 @@ let handleUserLogin = (email, password) => {
       let isExist = await checkUserEmail(email);
       if (isExist) {
         let user = await db.User.findOne({
-          attributes: ["email", "username", "roleID", "password", "userVerified", "companyVerified", "id", "image", "companyId"],
+          attributes: [
+            "email",
+            "username",
+            "roleID",
+            "password",
+            "userVerified",
+            "companyVerified",
+            "id",
+            "image",
+            "companyId",
+          ],
           where: { email: email },
           raw: true,
         });
         if (user) {
+          let expiresInRefreshToken = process.env.EXPIRES_REFRESH_TOKEN;
+          let expiresInAccessToken = process.env.EXPIRES_ACCESS_TOKEN;
           if (user.roleID === "R3") {
             let checkPass = await bcrypt.compareSync(password, user.password);
             if (checkPass) {
@@ -36,8 +48,16 @@ let handleUserLogin = (email, password) => {
                     "Your account has not been verified by the company. Please contact the relevant department to verify your account to continue",
                 });
               } else {
-                let accessToken = jwt.sign({ userId: user.id, role: user.roleID }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "30s" });
-                let refreshToken = jwt.sign({ userId: user.id, role: user.roleID }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: "1d" });
+                let accessToken = jwt.sign(
+                  { userId: user.id, role: user.roleID },
+                  process.env.SECRET_JWT_USER,
+                  { expiresIn: expiresInAccessToken }
+                );
+                let refreshToken = jwt.sign(
+                  { userId: user.id, role: user.roleID },
+                  process.env.REFRESH_TOKEN_SECRET,
+                  { expiresIn: expiresInRefreshToken }
+                );
 
                 if (user && user.image) {
                   user.image = new Buffer(user.image, "base64").toString("binary");
@@ -50,6 +70,7 @@ let handleUserLogin = (email, password) => {
                   message: "Succeed",
                   accessToken: accessToken,
                   refreshToken: refreshToken,
+                  expires_in: expiresInAccessToken,
                   user: user,
                 });
               }
@@ -71,19 +92,27 @@ let handleUserLogin = (email, password) => {
               } else {
                 let company = await db.Company.findOne({
                   where: { email: email },
-                  attributes: ["email", "verifed"],
                   raw: true,
                 });
                 if (!company.verifed) {
                   resolve({
                     errCode: 5,
-                    message: "Your account has not been verified by Luxas. Please wait or contact Luxas for support",
+                    message:
+                      "Your account has not been verified by Luxas. Please wait or contact Luxas for support",
                   });
                 } else {
-                  let accessToken = jwt.sign({ userId: user.id, role: user.roleID }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "30s" });
-                  let refreshToken = jwt.sign({ userId: user.id, role: user.roleID }, process.env.REFRESH_TOKEN_SECRET, {
-                    expiresIn: "1d",
-                  });
+                  let accessToken = jwt.sign(
+                    { userId: user.id, role: user.roleID },
+                    process.env.SECRET_JWT_ADMIN,
+                    { expiresIn: expiresInAccessToken }
+                  );
+                  let refreshToken = jwt.sign(
+                    { userId: user.id, role: user.roleID },
+                    process.env.REFRESH_TOKEN_SECRET,
+                    {
+                      expiresIn: expiresInRefreshToken,
+                    }
+                  );
 
                   if (user && user.image) {
                     user.image = new Buffer(user.image, "base64").toString("binary");
@@ -97,9 +126,9 @@ let handleUserLogin = (email, password) => {
                     accessToken: accessToken,
                     refreshToken: refreshToken,
                     user: user,
+                    expires_in: expiresInAccessToken,
                   });
                 }
-
               }
             } else {
               resolve({
@@ -111,8 +140,16 @@ let handleUserLogin = (email, password) => {
           if (user.roleID === "R1") {
             let checkPass = await bcrypt.compareSync(password, user.password);
             if (checkPass) {
-              let accessToken = jwt.sign({ userId: user.id, role: user.roleID }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "30s" });
-              let refreshToken = jwt.sign({ userId: user.id, role: user.roleID }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: "1d" });
+              let accessToken = jwt.sign(
+                { userId: user.id, role: user.roleID },
+                process.env.SECRET_JWT_ADMIN_SYS,
+                { expiresIn: expiresInAccessToken }
+              );
+              let refreshToken = jwt.sign(
+                { userId: user.id, role: user.roleID },
+                process.env.REFRESH_TOKEN_SECRET,
+                { expiresIn: expiresInRefreshToken }
+              );
 
               userData.errCode = 0;
               userData.message = "Ok";
@@ -128,6 +165,7 @@ let handleUserLogin = (email, password) => {
                 accessToken: accessToken,
                 refreshToken: refreshToken,
                 user: user,
+                expires_in: expiresInAccessToken,
               });
             } else {
               resolve({
@@ -365,7 +403,34 @@ let deleteUser = (userId) => {
     }
   });
 };
-let updateUser = (data) => {
+let handleUpdateImageAvatar = (data) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      console.log("adasdasd");
+      let user = await db.User.findOne({
+        where: { id: data.id },
+        raw: false,
+      });
+      if (user) {
+        user.image = data.avatar;
+        await user.save();
+        resolve({
+          errCode: 0,
+          message: `Update the Avatar succeed`,
+        });
+      } else {
+        resolve({
+          errCode: 1,
+          message: `User's not found!`,
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      reject(error);
+    }
+  });
+};
+let handleUpdateRoleUser = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
       let user = await db.User.findOne({
@@ -373,54 +438,80 @@ let updateUser = (data) => {
         raw: false,
       });
       if (user) {
-        if (data.type === "info") {
-          user.email = data.email;
-          user.phonenumber = data.phonenumber;
-          user.gender = data.gender;
-          await user.save();
-          resolve({
-            errCode: 0,
-            message: `User information update successful`,
-          });
-        }
-        if (data.type === "role") {
-          user.roleID = data.role;
-          await user.save();
-          resolve({
-            errCode: 0,
-            message: `Update the Role succeed`,
-          });
-        }
-        if (data.type === "image") {
-          user.image = data.avatar;
-          await user.save();
-          resolve({
-            errCode: 0,
-            message: `Update the Avatar succeed`,
-          });
-        }
-        if (data.type === "password") {
-          let resData = await db.User.findOne({
-            where: { id: data.id },
-            attributes: ["id", "password"],
-            raw: false,
-          });
-          if (resData) {
-            let checkPass = await bcrypt.compareSync(data.oldPassword, resData.password);
-            if (checkPass) {
-              resData.password = await hashUserPassword(data.newPassword);
-              console.log(resData);
-              await resData.save();
-              resolve({
-                errCode: 0,
-                message: `Password update successful`,
-              });
-            } else {
-              resolve({
-                errCode: 1,
-                message: `Old password is incorrect`,
-              });
-            }
+        user.roleID = data.role;
+        await user.save();
+        resolve({
+          errCode: 0,
+          message: `Update the Role succeed`,
+        });
+      } else {
+        resolve({
+          errCode: 1,
+          message: `User's not found!`,
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      reject(error);
+    }
+  });
+};
+let handleEditInforUser = (data) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let user = await db.User.findOne({
+        where: { id: data.id },
+        raw: false,
+      });
+      if (user) {
+        user.email = data.email;
+        user.phonenumber = data.phonenumber;
+        user.gender = data.gender;
+        await user.save();
+        resolve({
+          errCode: 0,
+          message: `User information update successful`,
+        });
+      } else {
+        resolve({
+          errCode: 1,
+          message: `User's not found!`,
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      reject(error);
+    }
+  });
+};
+let handleChangePassWord = (data) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let user = await db.User.findOne({
+        where: { id: data.id },
+        raw: false,
+      });
+      if (user) {
+        let resData = await db.User.findOne({
+          where: { id: data.id },
+          attributes: ["id", "password"],
+          raw: false,
+        });
+        if (resData) {
+          let checkPass = await bcrypt.compareSync(data.oldPassword, resData.password);
+          if (checkPass) {
+            resData.password = await hashUserPassword(data.newPassword);
+            console.log(resData);
+            await resData.save();
+            resolve({
+              errCode: 0,
+              message: `Password update successful`,
+            });
+          } else {
+            resolve({
+              errCode: 1,
+              message: `Old password is incorrect`,
+            });
           }
         }
       } else {
@@ -659,7 +750,6 @@ module.exports = {
   getAllUsers: getAllUsers,
   createNewUser: createNewUser,
   deleteUser: deleteUser,
-  updateUser: updateUser,
   verifyEmail: verifyEmail,
   sendEmailWarning: sendEmailWarning,
   getAllCodeService: getAllCodeService,
@@ -669,4 +759,8 @@ module.exports = {
   handleConfirmCompany: handleConfirmCompany,
   getAllUserByCompany: getAllUserByCompany,
   handleConfirmUserByCompany: handleConfirmUserByCompany,
+  handleChangePassWord: handleChangePassWord,
+  handleEditInforUser: handleEditInforUser,
+  handleUpdateRoleUser: handleUpdateRoleUser,
+  handleUpdateImageAvatar: handleUpdateImageAvatar,
 };

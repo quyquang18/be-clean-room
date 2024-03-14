@@ -183,10 +183,35 @@ let deleteRoom = (inputData) => {
     }
   });
 };
+
+let getRoomAndCompanybyDeviceId = (deviceId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!deviceId) {
+        resolve({
+          errCode: 1,
+          data: "Missing required parameter",
+        });
+      } else {
+        console.log(deviceId);
+        resolve({
+          errCode: 0,
+          data: deviceId,
+          message: "test success",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      reject(error);
+    }
+  });
+};
+
 module.exports = {
   createNewRoom: createNewRoom,
   getAllRoom: getAllRoom,
   getDetailRoomById: getDetailRoomById,
   updateInfoRoom: updateInfoRoom,
   deleteRoom: deleteRoom,
+  getRoomAndCompanybyDeviceId: getRoomAndCompanybyDeviceId,
 };

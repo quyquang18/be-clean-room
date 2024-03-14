@@ -10,15 +10,13 @@ let handleLogin = async (req, res) => {
     });
   } else {
     let userData = await userServices.handleUserLogin(email, password);
-    let optionsCookie = { httpOnly: false, sameSite: "None", secure: true, maxAge: 24 * 60 * 60 * 1000 };
-    res.cookie("user_role", userData.accessToken, optionsCookie, { domain: process.env.URL_REACT });
     return res.status(200).json(userData);
   }
 };
 let handleGetAllUsers = async (req, res) => {
   let id = req.query.type;
   if (!id) {
-    return res.status(500).json({
+    return res.status(400).json({
       errCode: 1,
       message: "Missing required parameter",
       user: [],
@@ -41,7 +39,7 @@ let handleCreateNewCompany = async (req, res) => {
 };
 let handleDeleteUser = async (req, res) => {
   if (!req.body.id) {
-    return res.status(500).json({
+    return res.status(400).json({
       errCode: 1,
       message: "Missing required parameters",
     });
@@ -49,15 +47,50 @@ let handleDeleteUser = async (req, res) => {
   let message = await userServices.deleteUser(req.body.id);
   return res.status(200).json(message);
 };
-let handleEditUser = async (req, res) => {
+
+let handleEditInforUser = async (req, res) => {
   let data = req.body;
   if (!req.body.id) {
-    return res.status(500).json({
+    return res.status(400).json({
       errCode: 1,
       message: "Missing required parameters",
     });
   }
-  let message = await userServices.updateUser(data);
+  let message = await userServices.handleEditInforUser(data);
+  return res.status(200).json(message);
+};
+let handleUpdateRoleUser = async (req, res) => {
+  let data = req.body;
+  if (!req.body.id) {
+    return res.status(400).json({
+      errCode: 1,
+      message: "Missing required parameters",
+    });
+  }
+  let message = await userServices.handleUpdateRoleUser(data);
+  return res.status(200).json(message);
+};
+let handleUpdateImageAvatar = async (req, res) => {
+  let data = req.body;
+  console.log("--------------------1--------------------");
+  if (!req.body.id) {
+    return res.status(400).json({
+      errCode: 1,
+      message: "Missing required parameters",
+    });
+  }
+  let message = await userServices.handleUpdateImageAvatar(data);
+  return res.status(200).json(message);
+};
+let handleChangePassWord = async (req, res) => {
+  let data = req.body;
+  if (!req.body.id) {
+    return res.status(400).json({
+      errCode: 1,
+      message: "Missing required parameters",
+    });
+  }
+  let message = await userServices.handleChangePassWord(data);
   return res.status(200).json(message);
 };
 let handleVerifyEmail = async (req, res) => {
@@ -70,7 +103,7 @@ let handleVerifyEmail = async (req, res) => {
 let handleSendEmailWarning = async (req, res) => {
   let data = req.body;
   if (!data) {
-    return res.status(500).json({
+    return res.status(400).json({
       errCode: 1,
       message: "Missing required parameters",
     });
@@ -149,7 +182,6 @@ module.exports = {
   handleLogin: handleLogin,
   handleGetAllUsers: handleGetAllUsers,
   handleCreateNewUser: handleCreateNewUser,
-  handleEditUser: handleEditUser,
   handleDeleteUser: handleDeleteUser,
   handleVerifyEmail: handleVerifyEmail,
   handleSendEmailWarning: handleSendEmailWarning,
@@ -160,4 +192,8 @@ module.exports = {
   handleConfirmCompany: handleConfirmCompany,
   getAllUserByCompany: getAllUserByCompany,
   handleConfirmUserByCompany: handleConfirmUserByCompany,
+  handleChangePassWord: handleChangePassWord,
+  handleEditInforUser: handleEditInforUser,
+  handleUpdateRoleUser: handleUpdateRoleUser,
+  handleUpdateImageAvatar: handleUpdateImageAvatar,
 };

@@ -7,7 +7,8 @@ import viewEngine from "./config/viewEngine";
 import initWebRoutes from "./route/web";
 import connectDB from "./config/connectDB";
 let app = express();
-app.use(cors({ credentials: true, origin: process.env.URL_REACT }));
+app.use(cors({ credentials: true, origin: [process.env.URL_REACT,'http://192.168.1.102/'] }));
+// app.use(cors())
 //config app
 
 app.use(bodyParser.json({ limit: "50mb" }));

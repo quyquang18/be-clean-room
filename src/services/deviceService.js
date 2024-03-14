@@ -47,8 +47,9 @@ const getAllDeviceInRoom = (inputData) => {
       } else {
         let data = await db.Device.findAll({
           where: { companyId: inputData.companyId, roomId: inputData.roomId },
-          attributes: ["id", "deviceName"],
+          attributes: ["id", "deviceName", "typeDevice"],
         });
+        console.log(data);
         resolve({
           errCode: 0,
           data: data,
@@ -116,6 +117,7 @@ let createNewDevice = (inputData) => {
             },
             raw: true,
           });
+
           if (created) {
             resolve({
               errCode: 0,
@@ -156,17 +158,34 @@ let createNewDevice = (inputData) => {
               message: `device has been added to available location ${room._previousDataValues.id} successfully`,
             });
           } else {
-            let data = await db.Device.create({
-              deviceName: inputData.deviceName,
-              typeDevice: inputData.typeDevice,
-              roomId: room.id,
-              companyId: inputData.companyId,
+            let [device, createdDevice] = await db.Device.findOrCreate({
+              where: {
+                deviceName: inputData.deviceName,
+                typeDevice: inputData.typeDevice,
+                roomId: room.id,
+                companyId: inputData.companyId,
+              },
+              defaults: {
+                deviceName: inputData.deviceName,
+                typeDevice: inputData.typeDevice,
+                roomId: room.id,
+                companyId: inputData.companyId,
+              },
+              raw: true,
             });
-            resolve({
-              errCode: 0,
-              data,
-              message: `device has been added to new location ${room.id} successfully`,
-            });
+            if (createdDevice) {
+              resolve({
+                errCode: 0,
+                data: device,
+                message: `device has been added to new location ${room.id} successfully`,
+              });
+            } else {
+              resolve({
+                errCode: 2,
+                message: "The device already exists in this location. Please try again !",
+                data: device,
+              });
+            }
           }
         }
       }
@@ -205,7 +224,13 @@ let deleteDevice = (deviceId) => {
 const getStatusDevice = (inputData) => {
   return new Promise(async (resolve, reject) => {
     try {
-      if (!inputData.companyId || !inputData.roomId || !inputData.deviceId || !inputData.date || !inputData.type) {
+      if (
+        !inputData.companyId ||
+        !inputData.roomId ||
+        !inputData.deviceId ||
+        !inputData.date ||
+        !inputData.type
+      ) {
         resolve({
           errCode: 1,
           message: "Missing required parameter",
@@ -236,6 +261,7 @@ const getStatusDevice = (inputData) => {
           let inputDate = inputData.date.split(",");
           const startTime = moment(new Date(+inputDate[0])).utcOffset("+07:00").startOf("date").valueOf();
           const endTime = moment(new Date(+inputDate[1])).utcOffset("+07:00").endOf("date").valueOf();
+          console.log(startTime, endTime);
           data = await db.statusDevice.findAll({
             where: {
               companyId: inputData.companyId,

@@ -13,7 +13,9 @@ let getValueSensorByTime = async (req, res) => {
 let handlePostDataFromEsp32 = async (req, res) => {
   let data = req.body;
   try {
+    // console.log(req.body);
     let info = await sensorService.createNewValueSensor(data);
+    console.log(info);
     return res.status(200).json(info);
   } catch (error) {
     console.log(error);
@@ -43,7 +45,6 @@ let updateValueThreshold = async (req, res) => {
     let info = await sensorService.updateValueThreshold(data);
     return res.status(200).json(info);
   } catch (error) {
-    console.log(error);
     return res.status(200).json({
       errCode: -1,
       message: "Error From the Server",

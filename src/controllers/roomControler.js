@@ -56,6 +56,17 @@ let deleteRoom = async (req, res) => {
     });
   }
 };
+let getRoomAndCompanybyDeviceId = async (req, res) => {
+  try {
+    let response = await roomService.getRoomAndCompanybyDeviceId(req.body.deviceId);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(200).json({
+      errCode: -1,
+      message: "Error from server",
+    });
+  }
+};
 
 module.exports = {
   createNewRoom: createNewRoom,
@@ -63,4 +74,5 @@ module.exports = {
   getDetailRoomById: getDetailRoomById,
   updateInfoRoom: updateInfoRoom,
   deleteRoom: deleteRoom,
+  getRoomAndCompanybyDeviceId: getRoomAndCompanybyDeviceId,
 };
